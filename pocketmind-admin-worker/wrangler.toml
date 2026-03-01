@@ -1,6 +1,9 @@
-name = "pocketmind-admin-worker"
+name = "pocketmind"
 main = "src/index.js"
-compatibility_date = "2024-03-01"
+compatibility_date = "2026-03-02"
+type = "javascript"
 
 [observability]
 enabled = true
+[build]
+command = ""

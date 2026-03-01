@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PocketMind</string>
+    <string name="title_home">Home</string>
+    <string name="title_add">Add</string>
+    <string name="title_report">Report</string>
+    <string name="title_profile">Profile</string>
+    <string name="action_login">Sign In</string>
+    <string name="action_login_google">Sign in with Google</string>
+    <string name="action_register">Register</string>
+    <string name="action_logout">Logout</string>
+</resources>

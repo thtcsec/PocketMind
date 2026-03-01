@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PocketMind</string>
+    <string name="title_home">Trang chủ</string>
+    <string name="title_add">Thêm</string>
+    <string name="title_report">Báo cáo</string>
+    <string name="title_profile">Cá nhân</string>
+    <string name="action_login">Đăng nhập</string>
+    <string name="action_login_google">Đăng nhập bằng Google</string>
+    <string name="action_register">Đăng ký</string>
+    <string name="action_logout">Đăng xuất</string>
+</resources>

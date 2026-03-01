@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Document background -->
+    <path
+        android:fillColor="?android:attr/textColorPrimary"
+        android:pathData="M14,2H6C4.9,2 4,2.9 4,4V20C4,21.1 4.9,22 6,22H18C19.1,22 20,21.1 20,20V8L14,2Z" />
+
+    <!-- Document fold -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.2"
+        android:pathData="M14,2V8H20L14,2Z" />
+
+    <!-- Check mark -->
+    <path
+        android:fillColor="?android:attr/windowBackground"
+        android:pathData="M9,16.2L5.5,12.7L6.9,11.3L9,13.4L15.1,7.3L16.5,8.7L9,16.2Z" />
+</vector>

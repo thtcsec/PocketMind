@@ -55,8 +55,25 @@ captures/
 .externalNativeBuild/
 .cxx/
 
+# Python (if any)
+.venv/
+venv/
+
+# Other IDE
+.vscode/
+.kiro/
+.cursor/
+.antigravity/
+.agent/
+
 # Google Services (e.g. APIs or Firebase)
 google-services.json
 
 # macOS
 .DS_Store
+
+
+# Firebase
+google-services.json
+firebase_rules.txt
+firebase_plans_structure.json

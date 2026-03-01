@@ -1,0 +1,13 @@
+{
+    "name": "pocketmind-admin-worker",
+    "version": "1.0.0",
+    "description": "Cloudflare Worker for PocketMind Admin Tasks",
+    "main": "src/index.js",
+    "scripts": {
+        "deploy": "wrangler deploy"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "wrangler": "^3.0.0"
+    }
+}

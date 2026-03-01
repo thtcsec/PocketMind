@@ -8,4 +8,79 @@
     <string name="action_login_google">Sign in with Google</string>
     <string name="action_register">Register</string>
     <string name="action_logout">Logout</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Settings</string>
+    <string name="settings_appearance_language">Appearance &amp; Language</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_language">Language: English</string>
+    <string name="settings_data_storage">Data &amp; Storage</string>
+    <string name="settings_currency">Currency</string>
+    <string name="settings_clear_cache">Clear Cache</string>
+    <string name="settings_app_info">About</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_developer">Developer: Trinh Hoang Tu</string>
+
+    <!-- AI Settings -->
+    <string name="settings_ai_section">Artificial Intelligence</string>
+    <string name="settings_ai_config">AI Configuration</string>
+    <string name="ai_config_api_key">Use Personal API Key</string>
+    <string name="ai_config_pocketmind">PocketMind AI Plans</string>
+    <string name="ai_plan_free">FREE PLAN (5 Chats/Day)</string>
+    <string name="ai_plan_pro">PRO PLAN (Unlimited Text)</string>
+    <string name="ai_plan_max">MAX PLAN (Unlimited Audio/Image)</string>
+
+    <!-- Dialog & Generic Actions -->
+    <string name="action_cancel">Cancel</string>
+
+    <!-- Profile -->
+    <string name="profile_logout_title">Logout</string>
+    <string name="profile_logout_msg">Are you sure you want to sign out?</string>
+
+    <!-- Add Fragment -->
+    <string name="add_voice_recording">Recording AI Voice...</string>
+    <string name="error_mic_permission">Microphone permission required.</string>
+    <string name="add_camera_opening">Opening camera for AI analysis...</string>
+    <string name="error_camera_permission">Camera permission required.</string>
+    <string name="add_saving_manual">Saving manual transaction...</string>
+
+    <!-- Payment Dialog -->
+    <string name="payment_title">AI Plan Payment</string>
+    <string name="payment_desc">Please transfer to the account below with the EXACT content for automated approval.</string>
+    <string name="payment_bank_name">Bank: Vietcombank</string>
+    <string name="payment_bank_account">Account No: 0123456789</string>
+    <string name="payment_bank_owner">Owner: TRINH HOANG TU</string>
+    <string name="payment_code_label">TRANSFER CONTENT (REQUIRED):</string>
+    <string name="action_transferred">I have transferred</string>
+
+    <!-- AI Settings Extended -->
+    <string name="ai_config_subtitle">Choose your preferred AI Provider method. You can use your own API keys for full control, or subscribe to PocketMind AI and let us handle it.</string>
+    <string name="ai_mode_plans">PocketMind Plans</string>
+    <string name="ai_mode_apikey">My API Key</string>
+    <string name="ai_plan_free_desc">Resets everyday at midnight. Allows up to 5 chat messages to the AI per day.</string>
+    <string name="ai_status_active">Current Status: ACTIVE</string>
+    <string name="ai_plan_pro_desc">Unlimited text-based interactions with PocketMind AI. Best for daily power users.</string>
+    <string name="ai_plan_max_desc">Unlimited text, voice uploads, and receipt image processing powered by top-tier models.</string>
+    <string name="ai_provider_hint">AI Provider</string>
+    <string name="ai_apikey_hint">API Key</string>
+    <string name="ai_btn_save_key">Save API Configuration</string>
+    <string name="ai_note_key_security">Note: Your API key is stored securely on your device and is only transmitted directly to the provider.</string>
+    <string name="ai_loading">Loading...</string>
+    <string name="ai_err_exchange_rate">Could not load current exchange rate.</string>
+    <string name="ai_err_select_provider">Please select a Provider</string>
+    <string name="ai_err_enter_key">Please enter API Key</string>
+    <string name="ai_msg_key_saved">Saved API Key for %1$s</string>
+    <string name="ai_err_login_required">Please login to proceed with payment</string>
+    <string name="ai_msg_payment_processing">Processing...</string>
+    <string name="ai_msg_payment_pending">Verification request sent! Awaiting approval...</string>
+    <string name="ai_err_connection">Connection error. Please try again later.</string>
+    <string name="ai_toast_payment_title">Pay %1$s</string>
+
+    <!-- Home Fragment -->
+    <string name="home_total_expenses">Total Expenses</string>
+    <string name="home_comparison_mock">+5% from last month</string>
+    <string name="home_recent_transactions">Recent Transactions</string>
 </resources>

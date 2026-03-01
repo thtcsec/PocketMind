@@ -9,4 +9,78 @@
     <string name="action_login_google">Đăng nhập bằng Google</string>
     <string name="action_register">Đăng ký</string>
     <string name="action_logout">Đăng xuất</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Cài đặt</string>
+    <string name="settings_appearance_language">Giao diện &amp; Ngôn ngữ</string>
+    <string name="settings_theme">Giao diện</string>
+    <string name="theme_system">Theo hệ thống</string>
+    <string name="theme_light">Sáng</string>
+    <string name="theme_dark">Tối</string>
+    <string name="settings_language">Ngôn ngữ: Tiếng Việt</string>
+    <string name="settings_data_storage">Dữ liệu &amp; Lưu trữ</string>
+    <string name="settings_currency">Tiền tệ</string>
+    <string name="settings_clear_cache">Xoá Cache đệm</string>
+    <string name="settings_app_info">Thông tin Ứng dụng</string>
+    <string name="settings_notifications">Thông báo</string>
+    <string name="settings_developer">Nhà phát triển: Trịnh Hoàng Tú</string>
+
+    <!-- Dialog & Generic Actions -->
+    <string name="action_cancel">Hủy</string>
+
+    <!-- Profile -->
+    <string name="profile_logout_title">Đăng xuất</string>
+    <string name="profile_logout_msg">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?</string>
+
+    <!-- Add Fragment -->
+    <string name="add_voice_recording">Bạn vừa nói: Đang khởi động AI Voice...</string>
+    <string name="error_mic_permission">Cần cấp quyền Microphone để dùng tính năng này.</string>
+    <string name="add_camera_opening">Mở thư viện ảnh/camera để phân tích với AI...</string>
+    <string name="error_camera_permission">Cần cấp quyền Camera để dùng tính năng này.</string>
+    <string name="add_saving_manual">Lưu giao dịch Manual...</string>
+
+    <!-- Payment Dialog -->
+    <string name="payment_title">Thanh toán gói AI</string>
+    <string name="payment_desc">Vui lòng chuyển khoản đến tài khoản dưới đây với ĐÚNG nội dung chuyển khoản để hệ thống duyệt tự động.</string>
+    <string name="payment_bank_name">Ngân hàng: Vietcombank</string>
+    <string name="payment_bank_account">STK: 0123456789</string>
+    <string name="payment_bank_owner">Chủ TK: TRINH HOANG TU</string>
+    <string name="payment_code_label">NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC):</string>
+    <string name="action_transferred">Tôi đã chuyển...</string>
+
+    <!-- AI Settings Extended -->
+    <string name="settings_ai_section">Thông minh nhân tạo</string>
+    <string name="settings_ai_config">Cấu hình AI</string>
+    <string name="ai_config_api_key">Dùng API Key Cá Nhân</string>
+    <string name="ai_config_pocketmind">Gói PocketMind AI</string>
+    <string name="ai_plan_free">GÓI MIỄN PHÍ (5 Chat/Ngày)</string>
+    <string name="ai_plan_pro">GÓI PRO (Không giới hạn chữ)</string>
+    <string name="ai_plan_max">GÓI MAX (Không giới hạn Thu Âm/Ảnh)</string>
+
+    <string name="ai_config_subtitle">Chọn phương thức AI. Bạn có thể sử dụng API Key cá nhân, hoặc đăng ký các gói của PocketMind.</string>
+    <string name="ai_mode_plans">Gói PocketMind</string>
+    <string name="ai_mode_apikey">API Key Của Tôi</string>
+    <string name="ai_plan_free_desc">Khôi phục mỗi nửa đêm. Cho phép 5 tin nhắn trò chuyện với AI mỗi ngày.</string>
+    <string name="ai_status_active">Trạng thái: ĐANG HOẠT ĐỘNG</string>
+    <string name="ai_plan_pro_desc">Tương tác văn bản không giới hạn với PocketMind AI. Phù hợp cho người dùng hàng ngày.</string>
+    <string name="ai_plan_max_desc">Không giới hạn văn bản, ghi âm và phân tích hình ảnh hóa đơn bằng các mô hình hàng đầu.</string>
+    <string name="ai_provider_hint">Nhà cung cấp AI</string>
+    <string name="ai_apikey_hint">API Key</string>
+    <string name="ai_btn_save_key">Lưu cấu hình API</string>
+    <string name="ai_note_key_security">Lưu ý: API Key của bạn được lưu trữ an toàn trên thiết bị và chỉ được gửi trực tiếp tới máy chủ cung cấp.</string>
+    <string name="ai_loading">Đang tải...</string>
+    <string name="ai_err_exchange_rate">Không thể tải tỷ giá ngoại tệ hiện tại.</string>
+    <string name="ai_err_select_provider">Vui lòng chọn loại Provider</string>
+    <string name="ai_err_enter_key">Vui lòng nhập API Key</string>
+    <string name="ai_msg_key_saved">Đã lưu API Key cho %1$s</string>
+    <string name="ai_err_login_required">Vui lòng đăng nhập để thanh toán</string>
+    <string name="ai_msg_payment_processing">Đang xử lý...</string>
+    <string name="ai_msg_payment_pending">Đã gửi yêu cầu đối soát! Đang đợi duyệt...</string>
+    <string name="ai_err_connection">Lỗi kết nối. Vui lòng thử lại sau.</string>
+    <string name="ai_toast_payment_title">Thanh toán %1$s</string>
+
+    <!-- Home Fragment -->
+    <string name="home_total_expenses">Tổng Chi Tiêu</string>
+    <string name="home_comparison_mock">+5% so với tháng trước</string>
+    <string name="home_recent_transactions">Giao dịch gần đây</string>
 </resources>

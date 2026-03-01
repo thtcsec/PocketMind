@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+
+    <!-- Sun/Moon half for theme icon -->
+    <path
+        android:fillColor="?android:attr/textColorPrimary"
+        android:pathData="M12,22C17.52,22 22,17.52 22,12S17.52,2 12,2 2,6.48 2,12s4.48,10 10,10zM12,20V4c4.42,0 8,3.58 8,8s-3.58,8 -8,8z"/>
+
+    <!-- Stars for dark mode -->
+    <path
+        android:fillColor="?android:attr/textColorPrimary"
+        android:pathData="M8.5,6.5m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"/>
+
+    <path
+        android:fillColor="?android:attr/textColorPrimary"
+        android:pathData="M5.5,9.5m-0.8,0a0.8,0.8 0,1 1,1.6 0a0.8,0.8 0,1 1,-1.6 0"/>
+
+    <path
+        android:fillColor="?android:attr/textColorPrimary"
+        android:pathData="M7,13m-0.6,0a0.6,0.6 0,1 1,1.2 0a0.6,0.6 0,1 1,-1.2 0"/>
+</vector>

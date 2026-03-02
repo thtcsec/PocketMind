@@ -32,6 +32,21 @@
     <string name="profile_logout_title">Đăng xuất</string>
     <string name="profile_logout_msg">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?</string>
 
+    <!-- Auth -->
+    <string name="auth_login_success">Đăng nhập thành công!</string>
+    <string name="auth_login_failed">Đăng nhập thất bại: %1$s</string>
+    <string name="auth_google_login_success">Đăng nhập Google thành công!</string>
+    <string name="auth_google_login_failed">Đăng nhập Google thất bại.</string>
+    <string name="auth_google_login_cancelled">Đã hủy đăng nhập Google.</string>
+    <string name="auth_register_success">Đăng ký thành công!</string>
+    <string name="auth_register_failed">Đăng ký thất bại: %1$s</string>
+    <string name="auth_err_empty_fields">Vui lòng nhập đầy đủ thông tin.</string>
+    <string name="auth_err_password_mismatch">Mật khẩu xác nhận không khớp.</string>
+    <string name="auth_err_password_length">Mật khẩu phải từ 6 kí tự.</string>
+    <string name="action_logging_in">Đang đăng nhập...</string>
+    <string name="action_registering">Đang đăng ký...</string>
+    <string name="auth_err_init_failed">Lỗi khởi tạo dữ liệu: %1$s</string>
+
     <!-- Add Fragment -->
     <string name="add_voice_recording">Bạn vừa nói: Đang khởi động AI Voice...</string>
     <string name="error_mic_permission">Cần cấp quyền Microphone để dùng tính năng này.</string>

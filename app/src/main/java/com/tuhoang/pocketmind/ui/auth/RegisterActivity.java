@@ -2,17 +2,28 @@ package com.tuhoang.pocketmind.ui.auth;
 
 import android.os.Bundle;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.view.Gravity;
+import android.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.tuhoang.pocketmind.R;
 import com.tuhoang.pocketmind.databinding.ActivityRegisterBinding;
 import com.tuhoang.pocketmind.utils.AppLogger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private ActivityRegisterBinding binding;
     private FirebaseAuth mAuth;
+    private AlertDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,22 +40,21 @@ public class RegisterActivity extends AppCompatActivity {
             String confirmPassword = binding.etConfirmPassword.getText().toString().trim();
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.auth_err_empty_fields), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!password.equals(confirmPassword)) {
-                Toast.makeText(this, "Mật khẩu xác nhận không khớp", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.auth_err_password_mismatch), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (password.length() < 6) {
-                Toast.makeText(this, "Mật khẩu phải từ 6 kí tự", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.auth_err_password_length), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            binding.btnRegister.setEnabled(false);
-            binding.btnRegister.setText("Đang đăng ký...");
+            showLoading(getString(R.string.action_registering));
 
             mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -61,17 +71,41 @@ public class RegisterActivity extends AppCompatActivity {
                                     .addOnCompleteListener(profileTask -> {
                                         if (profileTask.isSuccessful()) {
                                             AppLogger.d("User profile updated.");
-                                            Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                                            finish();
+                                            
+                                            // Save to Firestore
+                                            Map<String, Object> userData = new HashMap<>();
+                                            userData.put("uid", user.getUid());
+                                            userData.put("name", name);
+                                            userData.put("email", email);
+                                            userData.put("createdAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
+                                            userData.put("ai_chat_limit", 5); // Default free limit
+                                            
+                                            FirebaseFirestore.getInstance().collection("users")
+                                                .document(user.getUid())
+                                                .set(userData)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    hideLoading();
+                                                    AppLogger.d("User doc created in Firestore");
+                                                    Toast.makeText(RegisterActivity.this, getString(R.string.auth_register_success), Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    hideLoading();
+                                                    AppLogger.e("RegisterActivity", "Failed to create user doc", e);
+                                                    Toast.makeText(RegisterActivity.this, getString(R.string.auth_err_init_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
+                                                });
+                                        } else {
+                                            hideLoading();
                                         }
                                     });
+                        } else {
+                            hideLoading();
                         }
                     } else {
+                        hideLoading();
                         AppLogger.e("RegisterActivity", "createUserWithEmail:failure", task.getException());
-                        Toast.makeText(RegisterActivity.this, "Đăng ký thất bại: " + task.getException().getMessage(),
+                        Toast.makeText(RegisterActivity.this, getString(R.string.auth_register_failed, task.getException().getMessage()),
                                 Toast.LENGTH_SHORT).show();
-                        binding.btnRegister.setEnabled(true);
-                        binding.btnRegister.setText("Đăng ký");
                     }
                 });
         });
@@ -79,5 +113,36 @@ public class RegisterActivity extends AppCompatActivity {
         binding.tvLoginLink.setOnClickListener(v -> {
             finish();
         });
+    }
+
+    private void showLoading(String message) {
+        if (loadingDialog == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(false);
+            
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.HORIZONTAL);
+            layout.setPadding(50, 50, 50, 50);
+            layout.setGravity(Gravity.CENTER_VERTICAL);
+            
+            ProgressBar pb = new ProgressBar(this);
+            layout.addView(pb);
+            
+            TextView tv = new TextView(this);
+            tv.setText(message);
+            tv.setTextSize(16);
+            tv.setPadding(30, 0, 0, 0);
+            layout.addView(tv);
+            
+            builder.setView(layout);
+            loadingDialog = builder.create();
+        }
+        loadingDialog.show();
+    }
+
+    private void hideLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 }

@@ -81,6 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             userData.put("email", email);
                                             userData.put("createdAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
                                             userData.put("ai_chat_limit", 5); // Default free limit
+                                            userData.put("role", "user");
                                             
                                             FirebaseFirestore.getInstance().collection("users")
                                                 .document(user.getUid())

@@ -2,7 +2,6 @@ package com.tuhoang.pocketmind.ui.settings;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,12 +20,39 @@ import com.tuhoang.pocketmind.PocketMindApp;
 import com.tuhoang.pocketmind.R;
 import com.tuhoang.pocketmind.databinding.ActivitySettingsBinding;
 import com.tuhoang.pocketmind.utils.AppLogger;
+import com.tuhoang.pocketmind.utils.PrefsManager;
 import java.io.File;
+import java.util.Objects;
+
+import android.Manifest;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private ActivitySettingsBinding binding;
-    private SharedPreferences prefs;
+
+    private ActivityResultLauncher<String> requestCameraPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                binding.switchCamera.setChecked(isGranted);
+                PrefsManager.getInstance().setCameraEnabled(isGranted);
+            });
+
+    private ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                binding.switchStorage.setChecked(isGranted);
+                PrefsManager.getInstance().setStorageEnabled(isGranted);
+            });
+
+    private ActivityResultLauncher<String> requestMicPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                binding.switchMic.setChecked(isGranted);
+                PrefsManager.getInstance().setMicEnabled(isGranted);
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +64,8 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
-        prefs = getSharedPreferences(PocketMindApp.PREF_SETTINGS, Context.MODE_PRIVATE);
-
         // Setup Theme selection
-        updateThemeText(prefs.getInt(PocketMindApp.PREF_THEME, PocketMindApp.THEME_SYSTEM));
+        updateThemeText(PrefsManager.getInstance().getTheme(PocketMindApp.THEME_SYSTEM));
         
         binding.llTheme.setOnClickListener(v -> {
             showThemeDialog();
@@ -49,10 +73,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Setup Language display text based on current LocaleListCompat
         LocaleListCompat currentAppLocales = AppCompatDelegate.getApplicationLocales();
-        if (!currentAppLocales.isEmpty() && currentAppLocales.get(0).getLanguage().equals("vi")) {
-            binding.tvLanguageStatus.setText("Tiếng Việt");
+        if (!currentAppLocales.isEmpty() && Objects.requireNonNull(currentAppLocales.get(0)).getLanguage().equals("vi")) {
+            binding.tvLanguageStatus.setText(getText(R.string.vietnamese));
         } else {
-            binding.tvLanguageStatus.setText("English");
+            binding.tvLanguageStatus.setText(getText(R.string.english));
         }
 
         binding.llLanguage.setOnClickListener(v -> {
@@ -60,7 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         // Setup Currency selection
-        updateCurrencyText(prefs.getString(PocketMindApp.PREF_CURRENCY, "USD"));
+        updateCurrencyText(PrefsManager.getInstance().getCurrency("USD"));
         
         binding.llCurrency.setOnClickListener(v -> {
             showCurrencyDialog();
@@ -72,7 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (currentUser != null) {
                 startActivity(new Intent(SettingsActivity.this, AiSettingsActivity.class));
             } else {
-                Toast.makeText(this, "Bạn cần đăng nhập để thiết lập AI.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getText(R.string.you_must_login_to_configure), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -82,11 +106,55 @@ public class SettingsActivity extends AppCompatActivity {
 
         updateCacheSizeText();
 
-        // Setup Notifications Switch
-        binding.switchNotifications.setChecked(prefs.getBoolean(PocketMindApp.PREF_NOTIFICATIONS, true));
-        binding.switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean(PocketMindApp.PREF_NOTIFICATIONS, isChecked).apply();
-            AppLogger.d("Notifications toggled: " + isChecked);
+        // Setup System Permissions Switches (App-level preference overriding OS)
+        boolean isCameraGranted = hasPermission(Manifest.permission.CAMERA);
+        binding.switchCamera.setChecked(PrefsManager.getInstance().isCameraEnabled(isCameraGranted));
+        binding.switchCamera.setOnClickListener(v -> {
+            boolean isChecked = binding.switchCamera.isChecked();
+            if (isChecked) {
+                if (!hasPermission(Manifest.permission.CAMERA)) {
+                    binding.switchCamera.setChecked(false); // Revert until granted
+                    requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+                } else {
+                    PrefsManager.getInstance().setCameraEnabled(true);
+                }
+            } else {
+                PrefsManager.getInstance().setCameraEnabled(false);
+            }
+        });
+
+        boolean isStorageGranted = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        binding.switchStorage.setChecked(PrefsManager.getInstance().isStorageEnabled(isStorageGranted));
+        binding.switchStorage.setOnClickListener(v -> {
+            boolean isChecked = binding.switchStorage.isChecked();
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    PrefsManager.getInstance().setStorageEnabled(true);
+                } else if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    binding.switchStorage.setChecked(false); // Revert until granted
+                    requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                } else {
+                    PrefsManager.getInstance().setStorageEnabled(true);
+                }
+            } else {
+                PrefsManager.getInstance().setStorageEnabled(false);
+            }
+        });
+
+        boolean isMicGranted = hasPermission(Manifest.permission.RECORD_AUDIO);
+        binding.switchMic.setChecked(PrefsManager.getInstance().isMicEnabled(isMicGranted));
+        binding.switchMic.setOnClickListener(v -> {
+            boolean isChecked = binding.switchMic.isChecked();
+            if (isChecked) {
+                if (!hasPermission(Manifest.permission.RECORD_AUDIO)) {
+                    binding.switchMic.setChecked(false); // Revert until granted
+                    requestMicPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+                } else {
+                    PrefsManager.getInstance().setMicEnabled(true);
+                }
+            } else {
+                PrefsManager.getInstance().setMicEnabled(false);
+            }
         });
 
         // Set dynamic app version
@@ -98,6 +166,10 @@ public class SettingsActivity extends AppCompatActivity {
             binding.tvAbout.setText("Version: Unknown");
             AppLogger.e("SettingsActivity", "Could not get app version", e);
         }
+    }
+
+    private boolean hasPermission(String permission) {
+        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void updateThemeText(int themePref) {
@@ -116,12 +188,12 @@ public class SettingsActivity extends AppCompatActivity {
             getString(R.string.theme_light), 
             getString(R.string.theme_dark)
         };
-        int currentTheme = prefs.getInt(PocketMindApp.PREF_THEME, PocketMindApp.THEME_SYSTEM);
+        int currentTheme = PrefsManager.getInstance().getTheme(PocketMindApp.THEME_SYSTEM);
 
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.settings_theme))
                 .setSingleChoiceItems(themes, currentTheme, (dialog, which) -> {
-                    prefs.edit().putInt(PocketMindApp.PREF_THEME, which).apply();
+                    PrefsManager.getInstance().setTheme(which);
                     
                     switch (which) {
                         case PocketMindApp.THEME_LIGHT:
@@ -172,8 +244,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void showCurrencyDialog() {
         String[] currencies = {"USD", "AUD", "JPY", "VND"};
-        String currentCurrency = prefs.getString(PocketMindApp.PREF_CURRENCY, "USD");
-        int checkedItem = 0;
+        String currentCurrency = PrefsManager.getInstance().getCurrency("USD");
+        int checkedItem = -1;
         for (int i = 0; i < currencies.length; i++) {
             if (currencies[i].equals(currentCurrency)) {
                 checkedItem = i;
@@ -184,9 +256,8 @@ public class SettingsActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.settings_currency))
                 .setSingleChoiceItems(currencies, checkedItem, (dialog, which) -> {
-                    String selected = currencies[which];
-                    prefs.edit().putString(PocketMindApp.PREF_CURRENCY, selected).apply();
-                    updateCurrencyText(selected);
+                    PrefsManager.getInstance().setCurrency(currencies[which]);
+                    updateCurrencyText(currencies[which]);
                     dialog.dismiss();
                 })
                 .setNegativeButton("Cancel", null)

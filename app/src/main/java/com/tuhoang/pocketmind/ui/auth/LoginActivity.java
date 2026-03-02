@@ -50,6 +50,16 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(this, getString(R.string.auth_google_login_failed), Toast.LENGTH_SHORT).show();
                     }
                 } else {
+                    if (result.getData() != null) {
+                        try {
+                            Task<GoogleSignInAccount> errTask = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                            errTask.getResult(ApiException.class);
+                        } catch (ApiException e) {
+                            AppLogger.e("LoginActivity", "Google sign in failed or cancelled with error code: " + e.getStatusCode(), e);
+                        }
+                    } else {
+                        AppLogger.e("LoginActivity", "Google sign in returned resultCode: " + result.getResultCode() + " with null data");
+                    }
                     Toast.makeText(this, getString(R.string.auth_google_login_cancelled), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -143,6 +153,7 @@ public class LoginActivity extends AppCompatActivity {
                         userData.put("email", user.getEmail() != null ? user.getEmail() : "");
                         userData.put("createdAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
                         userData.put("ai_chat_limit", 5);
+                        userData.put("role", "user");
 
                         db.collection("users").document(user.getUid())
                             .set(userData)

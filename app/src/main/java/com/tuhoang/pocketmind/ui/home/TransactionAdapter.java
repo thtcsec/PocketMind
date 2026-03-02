@@ -1,4 +1,4 @@
-package com.tuhoang.pocketmind.ui.adapters;
+package com.tuhoang.pocketmind.ui.home;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;

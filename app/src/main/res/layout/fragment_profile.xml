@@ -26,8 +26,8 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@drawable/ic_profile"
-                android:layout_marginTop="16dp"/>
-            
+                android:layout_marginTop="16dp" />
+
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
                 android:text="Guest"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp" />
 
             <TextView
                 android:id="@+id/tvEmail"
@@ -44,15 +44,15 @@
                 android:text="Please login to sync data"
                 android:textSize="14sp"
                 android:textColor="@color/grey"
-                android:layout_marginTop="4dp"/>
-                
+                android:layout_marginTop="4dp" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogin"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Login / Register"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                android:text="Get Started" />
 
         </LinearLayout>
 
@@ -63,7 +63,65 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@color/green"
-            android:paddingBottom="8dp"/>
+            android:paddingBottom="8dp" />
+
+        <!-- Admin Dashboard -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnAdminDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_dashboard"
+                    app:tint="?attr/colorError" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/admin_dashboard_title"
+                        android:textColor="?attr/colorError"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/admin_dashboard_desc"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="?attr/colorError" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -79,6 +137,23 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/btnProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_profile"
+                    android:textSize="16sp"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawableStart="@drawable/ic_profile"
+                    app:drawableTint="?attr/colorOnSurface"
+                    android:drawablePadding="16dp" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
                     android:id="@+id/btnSettings"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -87,26 +162,11 @@
                     android:padding="16dp"
                     android:background="?attr/selectableItemBackground"
                     android:drawableStart="@drawable/ic_setting"
-                    android:drawablePadding="16dp"/>
+                    android:drawablePadding="16dp" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/btnWorkerSync"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Cloudflare / API Sync"
-                    android:textSize="16sp"
-                    android:padding="16dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:drawableStart="@android:drawable/ic_popup_sync"
-                    android:drawablePadding="16dp"/>
-
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/btnExportCsv"
@@ -117,12 +177,12 @@
                     android:padding="16dp"
                     android:background="?attr/selectableItemBackground"
                     android:drawableStart="@drawable/ic_save"
-                    android:drawablePadding="16dp"/>
-                    
+                    android:drawablePadding="16dp" />
+
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divLogout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/btnLogout"
@@ -134,10 +194,12 @@
                     android:padding="16dp"
                     android:background="?attr/selectableItemBackground"
                     android:drawableStart="@android:drawable/ic_lock_power_off"
-                    android:drawablePadding="16dp"/>
-                    
+                    android:drawablePadding="16dp" />
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
+
 </com.tuhoang.pocketmind.system.BounceScrollView>

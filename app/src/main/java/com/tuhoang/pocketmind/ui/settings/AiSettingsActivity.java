@@ -1,8 +1,6 @@
 package com.tuhoang.pocketmind.ui.settings;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -25,6 +23,7 @@ import com.tuhoang.pocketmind.databinding.ActivityAiSettingsBinding;
 import com.tuhoang.pocketmind.utils.AppLogger;
 import com.tuhoang.pocketmind.utils.CurrencyUtils;
 import com.tuhoang.pocketmind.utils.PaymentUtils;
+import com.tuhoang.pocketmind.utils.PrefsManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,10 +64,6 @@ public class AiSettingsActivity extends AppCompatActivity {
             }
         });
 
-        // Remove previous hardcoded click listeners since cards are dynamic now
-        // Wiring Subscription Clicks will be handled when cards are dynamically created
-
-
         // Wiring API Key Save
         binding.btnSaveApiKey.setOnClickListener(v -> {
             String selectedProvider = binding.acAiProvider.getText().toString();
@@ -91,8 +86,7 @@ public class AiSettingsActivity extends AppCompatActivity {
     }
 
     private void loadDynamicPlans() {
-        SharedPreferences prefs = getSharedPreferences(PocketMindApp.PREF_SETTINGS, Context.MODE_PRIVATE);
-        String currentCurrency = prefs.getString(PocketMindApp.PREF_CURRENCY, "USD");
+        String currentCurrency = PrefsManager.getInstance().getCurrency("USD");
 
         binding.llPocketMindPlans.removeAllViews(); // Clear any existing loading or placeholder views
 

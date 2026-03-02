@@ -198,11 +198,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="16dp"/>
 
-            <!-- Notifications Section -->
+            <!-- System Section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_notifications"
+                android:text="System"
                 android:textColor="@color/green"
                 android:textStyle="bold"
                 android:paddingBottom="8dp"/>
@@ -216,16 +216,61 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_notifications"
+                    android:src="@drawable/ic_camera"
                     app:tint="?attr/colorOnSurface"
                     android:layout_marginEnd="16dp"/>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switchNotifications"
+                    android:id="@+id/switchCamera"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/settings_notifications"
+                    android:text="@string/settings_permissions_camera"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_camera"
+                    app:tint="?attr/colorOnSurface"
+                    android:layout_marginEnd="16dp"/>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchStorage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_permissions_storage"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_micro"
+                    app:tint="?attr/colorOnSurface"
+                    android:layout_marginEnd="16dp"/>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchMic"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_permissions_mic"
                     android:textSize="16sp"
                     android:paddingVertical="12dp"/>
             </LinearLayout>

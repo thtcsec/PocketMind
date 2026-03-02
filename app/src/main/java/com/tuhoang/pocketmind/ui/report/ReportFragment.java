@@ -1,4 +1,4 @@
-package com.tuhoang.pocketmind.ui;
+package com.tuhoang.pocketmind.ui.report;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.AutoTransition;
 import androidx.transition.TransitionManager;
 
@@ -22,12 +23,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.tuhoang.pocketmind.R;
-import com.tuhoang.pocketmind.data.models.Transaction;
 import com.tuhoang.pocketmind.databinding.FragmentReportBinding;
 import com.tuhoang.pocketmind.utils.AppLogger;
 
@@ -42,9 +39,7 @@ import java.util.TimeZone;
 
 public class ReportFragment extends Fragment {
     private FragmentReportBinding binding;
-    
-    private Date currentStartDate;
-    private Date currentEndDate;
+    private ReportViewModel viewModel;
 
     @Nullable
     @Override
@@ -57,27 +52,56 @@ public class ReportFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Default to this week
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        currentEndDate = cal.getTime();
-        
-        cal.add(Calendar.DAY_OF_YEAR, -7);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        currentStartDate = cal.getTime();
+        viewModel = new ViewModelProvider(this).get(ReportViewModel.class);
 
         setupDateRangePicker();
         setupChartToggles();
-        fetchReportData();
+        observeViewModel();
+        
+        viewModel.fetchReportData();
+    }
+
+    private void observeViewModel() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        
+        viewModel.getStartDate().observe(getViewLifecycleOwner(), startDate -> {
+            Date endDate = viewModel.getEndDate().getValue();
+            if (startDate != null && endDate != null) {
+                binding.tvDateRange.setText(sdf.format(startDate) + " - " + sdf.format(endDate));
+            }
+        });
+        
+        viewModel.getEndDate().observe(getViewLifecycleOwner(), endDate -> {
+            Date startDate = viewModel.getStartDate().getValue();
+            if (startDate != null && endDate != null) {
+                binding.tvDateRange.setText(sdf.format(startDate) + " - " + sdf.format(endDate));
+            }
+        });
+
+        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading) {
+                binding.tvDateRange.append(" (Loading...)");
+            } else {
+                Date start = viewModel.getStartDate().getValue();
+                Date end = viewModel.getEndDate().getValue();
+                if (start != null && end != null) {
+                    binding.tvDateRange.setText(sdf.format(start) + " - " + sdf.format(end));
+                }
+            }
+        });
+
+        viewModel.getTotalIncome().observe(getViewLifecycleOwner(), income -> {
+            binding.tvTotalIncome.setText(String.format(Locale.US, "$%.2f", income));
+        });
+
+        viewModel.getTotalExpense().observe(getViewLifecycleOwner(), expense -> {
+            binding.tvTotalReportExpense.setText(String.format(Locale.US, "$%.2f", expense));
+        });
+
+        viewModel.getCategoryExpenses().observe(getViewLifecycleOwner(), this::renderData);
     }
 
     private void setupDateRangePicker() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-        binding.tvDateRange.setText(sdf.format(currentStartDate) + " - " + sdf.format(currentEndDate));
 
         binding.cardDateRange.setOnClickListener(v -> {
             MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
@@ -90,8 +114,8 @@ public class ReportFragment extends Fragment {
                     long offsetFirst = TimeZone.getDefault().getOffset(selection.first);
                     long offsetSecond = TimeZone.getDefault().getOffset(selection.second);
                     
-                    currentStartDate = new Date(selection.first - offsetFirst);
-                    currentEndDate = new Date(selection.second - offsetSecond);
+                    Date currentStartDate = new Date(selection.first - offsetFirst);
+                    Date currentEndDate = new Date(selection.second - offsetSecond);
                     
                     // Adjust end date to 23:59:59
                     Calendar cal = Calendar.getInstance();
@@ -101,11 +125,7 @@ public class ReportFragment extends Fragment {
                     cal.set(Calendar.SECOND, 59);
                     currentEndDate = cal.getTime();
                     
-                    String startStr = sdf.format(currentStartDate);
-                    String endStr = sdf.format(currentEndDate);
-                    binding.tvDateRange.setText(startStr + " - " + endStr);
-                    
-                    fetchReportData();
+                    viewModel.setDateRange(currentStartDate, currentEndDate);
                 }
             });
 
@@ -132,61 +152,7 @@ public class ReportFragment extends Fragment {
         });
     }
 
-    private void fetchReportData() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            clearCharts();
-            return;
-        }
-
-        binding.tvDateRange.append(" (Loading...)");
-
-        FirebaseFirestore.getInstance()
-                .collection("users").document(user.getUid()).collection("expenses")
-                .whereGreaterThanOrEqualTo("timestamp", currentStartDate)
-                .whereLessThanOrEqualTo("timestamp", currentEndDate)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    double totalIncome = 0;
-                    double totalExpense = 0;
-                    Map<String, Double> categoryExpenses = new HashMap<>();
-
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        Transaction t = doc.toObject(Transaction.class);
-                        if (t == null) continue;
-
-                        if ("income".equalsIgnoreCase(t.getType())) {
-                            totalIncome += t.getAmount();
-                        } else {
-                            totalExpense += t.getAmount();
-                            String cat = t.getCategory() != null ? t.getCategory() : "Other";
-                            categoryExpenses.put(cat, categoryExpenses.getOrDefault(cat, 0.0) + t.getAmount());
-                        }
-                    }
-
-                    renderData(totalIncome, totalExpense, categoryExpenses);
-                    
-                    // Reset loading text
-                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-                    binding.tvDateRange.setText(sdf.format(currentStartDate) + " - " + sdf.format(currentEndDate));
-                })
-                .addOnFailureListener(e -> {
-                    AppLogger.e("ReportFragment", "Failed to fetch report data", e);
-                    clearCharts();
-                });
-    }
-
-    private void clearCharts() {
-        binding.tvTotalIncome.setText("$0.00");
-        binding.tvTotalReportExpense.setText("$0.00");
-        binding.tvTopCategory.setText("Top Category: None");
-        binding.barChart.clear();
-        binding.pieChart.clear();
-    }
-
-    private void renderData(double totalIncome, double totalExpense, Map<String, Double> categoryExpenses) {
-        binding.tvTotalIncome.setText(String.format(Locale.US, "$%.2f", totalIncome));
-        binding.tvTotalReportExpense.setText(String.format(Locale.US, "$%.2f", totalExpense));
+    private void renderData(Map<String, Double> categoryExpenses) {
 
         if (categoryExpenses.isEmpty()) {
             binding.tvTopCategory.setText("No expenses in this period");

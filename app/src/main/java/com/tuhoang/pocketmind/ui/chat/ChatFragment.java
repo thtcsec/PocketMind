@@ -1,4 +1,4 @@
-package com.tuhoang.pocketmind.ui;
+package com.tuhoang.pocketmind.ui.chat;
 
 import android.os.Bundle;
 import android.transition.AutoTransition;
@@ -13,34 +13,34 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.tuhoang.pocketmind.R;
 import com.tuhoang.pocketmind.databinding.FragmentAddBinding;
-import com.tuhoang.pocketmind.data.AppDatabase;
 import com.tuhoang.pocketmind.data.models.ChatMessage;
-import com.tuhoang.pocketmind.ui.adapters.ChatAdapter;
+import com.tuhoang.pocketmind.utils.PrefsManager;
 
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-public class AddFragment extends Fragment {
+public class ChatFragment extends Fragment {
     private FragmentAddBinding binding;
     
     // Permission Launchers
     private ActivityResultLauncher<String> requestAudioPermissionLauncher;
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
+    private ActivityResultLauncher<String> pickImageLauncher;
     
     // AI Chat Dependencies
     private ChatAdapter chatAdapter;
-    private final ExecutorService diskIO = Executors.newSingleThreadExecutor();
-    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    private ChatViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+    }
 
     @Nullable
     @Override
@@ -66,9 +66,15 @@ public class AddFragment extends Fragment {
 
         requestCameraPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
-                Toast.makeText(requireContext(), getString(R.string.add_camera_opening), Toast.LENGTH_SHORT).show();
+                pickImageLauncher.launch("image/*");
             } else {
                 Toast.makeText(requireContext(), getString(R.string.error_camera_permission), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+            if (uri != null) {
+                viewModel.uploadImageAndSend(uri);
             }
         });
     }
@@ -100,6 +106,12 @@ public class AddFragment extends Fragment {
 
         // AI Mode Clicks
         binding.btnVoiceInput.setOnClickListener(v -> {
+            boolean micEnabled = PrefsManager.getInstance().isMicEnabled(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED);
+            if (!micEnabled) {
+                Toast.makeText(requireContext(), "Microphone is disabled in App Settings", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(requireContext(), getString(R.string.add_voice_recording), Toast.LENGTH_SHORT).show();
             } else {
@@ -108,10 +120,16 @@ public class AddFragment extends Fragment {
         });
 
         binding.btnUploadImage.setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(requireContext(), getString(R.string.add_camera_opening), Toast.LENGTH_SHORT).show();
+            boolean storageEnabled = PrefsManager.getInstance().isStorageEnabled(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU || ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED);
+            if (!storageEnabled) {
+                Toast.makeText(requireContext(), "Storage access is disabled in App Settings", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED || android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                pickImageLauncher.launch("image/*");
             } else {
-                requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
+                requestCameraPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE);
             }
         });
     }
@@ -123,16 +141,31 @@ public class AddFragment extends Fragment {
         binding.rvAiChat.setLayoutManager(layoutManager);
         binding.rvAiChat.setAdapter(chatAdapter);
 
-        // Load messages from DB
-        diskIO.execute(() -> {
-            List<ChatMessage> history = AppDatabase.getDatabase(requireContext()).chatDao().getAllMessages();
-            mainThreadHandler.post(() -> {
-                chatAdapter.setMessages(history);
-                if (!history.isEmpty()) {
-                    binding.rvAiChat.scrollToPosition(history.size() - 1);
-                }
-            });
+        if (binding.rvAiChat.getAdapter() == null) {
+            binding.rvAiChat.setAdapter(chatAdapter);
+        }
+
+        // Observe ViewModel
+        viewModel.getMessages().observe(getViewLifecycleOwner(), messages -> {
+            chatAdapter.setMessages(messages);
+            if (!messages.isEmpty()) {
+                binding.rvAiChat.scrollToPosition(messages.size() - 1);
+            }
         });
+
+        viewModel.getErrorEvents().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.getInfoEvents().observe(getViewLifecycleOwner(), info -> {
+            if (info != null) {
+                Toast.makeText(requireContext(), info, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.startListeningForMessages();
 
         // Setup Input Toggle
         binding.etAiInput.addTextChangedListener(new TextWatcher() {
@@ -156,14 +189,8 @@ public class AddFragment extends Fragment {
         // Handle Send Click
         binding.btnAiSend.setOnClickListener(v -> handleSendChat());
 
-        // Handle Clear Chat (Plan D: Explicit Reset)
-        binding.btnAiClear.setOnClickListener(v -> {
-            chatAdapter.setMessages(new java.util.ArrayList<>());
-            diskIO.execute(() -> {
-                AppDatabase.getDatabase(requireContext()).chatDao().deleteAll();
-            });
-            android.widget.Toast.makeText(requireContext(), "Chat context wiped.", android.widget.Toast.LENGTH_SHORT).show();
-        });
+        // Handle Clear Chat
+        binding.btnAiClear.setOnClickListener(v -> viewModel.clearChatHistory());
     }
 
     private void handleSendChat() {
@@ -172,30 +199,13 @@ public class AddFragment extends Fragment {
 
         // Clear input
         binding.etAiInput.setText("");
-
-        // Add user message
-        ChatMessage userMsg = new ChatMessage(currText, true, System.currentTimeMillis());
-        chatAdapter.addMessage(userMsg);
-        binding.rvAiChat.scrollToPosition(chatAdapter.getItemCount() - 1);
-
-        diskIO.execute(() -> {
-            AppDatabase.getDatabase(requireContext()).chatDao().insert(userMsg);
-        });
         
-        // Simulate response for now
-        simulateAiResponse();
+        viewModel.sendMessage(currText);
     }
-    
-    private void simulateAiResponse() {
-        mainThreadHandler.postDelayed(() -> {
-            ChatMessage botMsg = new ChatMessage("I will categorize your last transaction automatically.", false, System.currentTimeMillis());
-            chatAdapter.addMessage(botMsg);
-            binding.rvAiChat.scrollToPosition(chatAdapter.getItemCount() - 1);
-            
-            diskIO.execute(() -> {
-                AppDatabase.getDatabase(requireContext()).chatDao().insert(botMsg);
-            });
-        }, 1000);
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

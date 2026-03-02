@@ -24,6 +24,13 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_developer">Developer: Trinh Hoang Tu</string>
 
+    <!-- Admin Dashboard -->
+    <string name="admin_dashboard_title">Admin Dashboard</string>
+    <string name="admin_dashboard_desc">Manage Users and AI Plans (Admin Only)</string>
+    <string name="admin_tab_users">Users</string>
+    <string name="admin_tab_plans">AI Plans</string>
+    <string name="admin_err_no_access">You do not have administrative privileges.</string>
+
     <!-- AI Settings -->
     <string name="settings_ai_section">Artificial Intelligence</string>
     <string name="settings_ai_config">AI Configuration</string>
@@ -51,21 +58,21 @@
     <string name="auth_err_empty_fields">Please fill in all fields.</string>
     <string name="auth_err_password_mismatch">Passwords do not match.</string>
     <string name="auth_err_password_length">Password must be at least 6 characters.</string>
-    <string name="action_logging_in">Logging in...</string>
-    <string name="action_registering">Creating account...</string>
+    <string name="action_logging_in">Logging in…</string>
+    <string name="action_registering">Creating account…</string>
     <string name="auth_err_init_failed">Data initialization failed: %1$s</string>
 
     <!-- Add Fragment -->
-    <string name="add_voice_recording">Recording AI Voice...</string>
+    <string name="add_voice_recording">Recording AI Voice…</string>
     <string name="error_mic_permission">Microphone permission required.</string>
-    <string name="add_camera_opening">Opening camera for AI analysis...</string>
+    <string name="add_camera_opening">Opening camera for AI analysis…</string>
     <string name="error_camera_permission">Camera permission required.</string>
-    <string name="add_saving_manual">Saving manual transaction...</string>
+    <string name="add_saving_manual">Saving manual transaction…</string>
 
     <!-- Payment Dialog -->
     <string name="payment_title">AI Plan Payment</string>
     <string name="payment_desc">Please transfer to the account below with the EXACT content for automated approval.</string>
-    <string name="payment_bank_name">Bank: Vietcombank</string>
+    <string name="payment_bank_name">Bank: MB Bank</string>
     <string name="payment_bank_account">Account No: 0123456789</string>
     <string name="payment_bank_owner">Owner: TRINH HOANG TU</string>
     <string name="payment_code_label">TRANSFER CONTENT (REQUIRED):</string>
@@ -83,14 +90,14 @@
     <string name="ai_apikey_hint">API Key</string>
     <string name="ai_btn_save_key">Save API Configuration</string>
     <string name="ai_note_key_security">Note: Your API key is stored securely on your device and is only transmitted directly to the provider.</string>
-    <string name="ai_loading">Loading...</string>
+    <string name="ai_loading">Loading…</string>
     <string name="ai_err_exchange_rate">Could not load current exchange rate.</string>
     <string name="ai_err_select_provider">Please select a Provider</string>
     <string name="ai_err_enter_key">Please enter API Key</string>
     <string name="ai_msg_key_saved">Saved API Key for %1$s</string>
     <string name="ai_err_login_required">Please login to proceed with payment</string>
-    <string name="ai_msg_payment_processing">Processing...</string>
-    <string name="ai_msg_payment_pending">Verification request sent! Awaiting approval...</string>
+    <string name="ai_msg_payment_processing">Processing…</string>
+    <string name="ai_msg_payment_pending">Verification request sent! Awaiting approval…</string>
     <string name="ai_err_connection">Connection error. Please try again later.</string>
     <string name="ai_toast_payment_title">Pay %1$s</string>
 
@@ -98,4 +105,28 @@
     <string name="home_total_expenses">Total Expenses</string>
     <string name="home_comparison_mock">+5% from last month</string>
     <string name="home_recent_transactions">Recent Transactions</string>
+
+    <!-- Profile Fragment -->
+    <string name="guest">Guest</string>
+    <string name="please_login_to_sync">Please login to sync data</string>
+    <!-- Settings Permissions -->
+    <string name="settings_permissions_storage">Storage permission</string>
+    <string name="settings_permissions_mic">Microphone permission</string>
+    <string name="settings_permissions_camera">Camera permission</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="english">English</string>
+    <string name="you_must_login_to_configure">You must login to configure AI.</string>
+
+    <!-- Profile Delete Account -->
+    <string name="profile_delete_account">Delete Account</string>
+    <string name="profile_delete_title">Warning: Delete Account</string>
+    <string name="profile_delete_message">This action is irreversible. All your data, expenses, and AI chat history will be permanently deleted.\n\nType \"delete\" below and check the box to confirm.</string>
+    <string name="profile_delete_hint">Type \"delete\"</string>
+    <string name="profile_delete_keyword">delete</string>
+    <string name="profile_delete_confirm">I understand that my data will be lost</string>
+    <string name="profile_delete_invalid">You must type \"delete\" and check the box.</string>
+
+
+    <string name="get_started">Get started</string>
+    <string name="currency">Currency</string>
 </resources>

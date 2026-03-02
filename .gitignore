@@ -14,6 +14,7 @@ bin/
 gen/
 out/
 build/
+node_modules/
 
 # Gradle files
 .gradle/
@@ -79,3 +80,6 @@ firebase_rules.txt
 firebase_plans_structure.json
 pocketmind-admin-worker/node_modules/
 db_structure.txt
+pocketmind-ceb5e-firebase-adminsdk-fbsvc-52840f33f3.json
+sha1.txt
+signing_report.txt

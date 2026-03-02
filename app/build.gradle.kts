@@ -55,10 +55,14 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
     
     // Room
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
+    
+    // Image loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

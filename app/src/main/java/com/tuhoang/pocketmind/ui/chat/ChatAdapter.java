@@ -1,4 +1,4 @@
-package com.tuhoang.pocketmind.ui.adapters;
+package com.tuhoang.pocketmind.ui.chat;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tuhoang.pocketmind.R;
 import com.tuhoang.pocketmind.data.models.ChatMessage;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +62,29 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatMessage message = messages.get(position);
         if (holder.getItemViewType() == VIEW_TYPE_USER) {
-            ((UserMessageViewHolder) holder).tvUserMessage.setText(message.content);
+            UserMessageViewHolder userHolder = (UserMessageViewHolder) holder;
+            userHolder.tvUserMessage.setText(message.content);
+            if (message.imageUrl != null && !message.imageUrl.isEmpty()) {
+                userHolder.ivUserImage.setVisibility(View.VISIBLE);
+                Glide.with(userHolder.itemView.getContext())
+                        .load(message.imageUrl)
+                        .placeholder(R.drawable.ic_save) // Fallback placeholder
+                        .into(userHolder.ivUserImage);
+            } else {
+                userHolder.ivUserImage.setVisibility(View.GONE);
+            }
         } else {
-            ((AiMessageViewHolder) holder).tvAiMessage.setText(message.content);
+            AiMessageViewHolder aiHolder = (AiMessageViewHolder) holder;
+            aiHolder.tvAiMessage.setText(message.content);
+            if (message.imageUrl != null && !message.imageUrl.isEmpty()) {
+                aiHolder.ivAiImage.setVisibility(View.VISIBLE);
+                Glide.with(aiHolder.itemView.getContext())
+                        .load(message.imageUrl)
+                        .placeholder(R.drawable.ic_save)
+                        .into(aiHolder.ivAiImage);
+            } else {
+                aiHolder.ivAiImage.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -73,19 +95,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     static class UserMessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserMessage;
+        android.widget.ImageView ivUserImage;
 
         UserMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUserMessage = itemView.findViewById(R.id.tvUserMessage);
+            ivUserImage = itemView.findViewById(R.id.ivUserImage);
         }
     }
 
     static class AiMessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvAiMessage;
+        android.widget.ImageView ivAiImage;
 
         AiMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             tvAiMessage = itemView.findViewById(R.id.tvAiMessage);
+            ivAiImage = itemView.findViewById(R.id.ivAiImage);
         }
     }
 }

@@ -25,6 +25,13 @@
     <string name="settings_notifications">Thông báo</string>
     <string name="settings_developer">Nhà phát triển: Trịnh Hoàng Tú</string>
 
+    <!-- Admin Dashboard -->
+    <string name="admin_dashboard_title">Bảng điều khiển Quản trị</string>
+    <string name="admin_dashboard_desc">Quản lý Người dùng và Gói AI (Chỉ Quản trị viên)</string>
+    <string name="admin_tab_users">Người dùng</string>
+    <string name="admin_tab_plans">Gói AI</string>
+    <string name="admin_err_no_access">Bạn không có quyền truy cập quản trị viên.</string>
+
     <!-- Dialog & Generic Actions -->
     <string name="action_cancel">Hủy</string>
 
@@ -43,25 +50,25 @@
     <string name="auth_err_empty_fields">Vui lòng nhập đầy đủ thông tin.</string>
     <string name="auth_err_password_mismatch">Mật khẩu xác nhận không khớp.</string>
     <string name="auth_err_password_length">Mật khẩu phải từ 6 kí tự.</string>
-    <string name="action_logging_in">Đang đăng nhập...</string>
-    <string name="action_registering">Đang đăng ký...</string>
+    <string name="action_logging_in">Đang đăng nhập…</string>
+    <string name="action_registering">Đang đăng ký…</string>
     <string name="auth_err_init_failed">Lỗi khởi tạo dữ liệu: %1$s</string>
 
     <!-- Add Fragment -->
-    <string name="add_voice_recording">Bạn vừa nói: Đang khởi động AI Voice...</string>
+    <string name="add_voice_recording">Bạn vừa nói: Đang khởi động AI Voice…</string>
     <string name="error_mic_permission">Cần cấp quyền Microphone để dùng tính năng này.</string>
-    <string name="add_camera_opening">Mở thư viện ảnh/camera để phân tích với AI...</string>
+    <string name="add_camera_opening">Mở thư viện ảnh/camera để phân tích với AI…</string>
     <string name="error_camera_permission">Cần cấp quyền Camera để dùng tính năng này.</string>
-    <string name="add_saving_manual">Lưu giao dịch Manual...</string>
+    <string name="add_saving_manual">Lưu giao dịch Manual…</string>
 
     <!-- Payment Dialog -->
     <string name="payment_title">Thanh toán gói AI</string>
     <string name="payment_desc">Vui lòng chuyển khoản đến tài khoản dưới đây với ĐÚNG nội dung chuyển khoản để hệ thống duyệt tự động.</string>
-    <string name="payment_bank_name">Ngân hàng: Vietcombank</string>
+    <string name="payment_bank_name">Ngân hàng: MB Bank</string>
     <string name="payment_bank_account">STK: 0123456789</string>
     <string name="payment_bank_owner">Chủ TK: TRINH HOANG TU</string>
     <string name="payment_code_label">NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC):</string>
-    <string name="action_transferred">Tôi đã chuyển...</string>
+    <string name="action_transferred">Tôi đã chuyển…</string>
 
     <!-- AI Settings Extended -->
     <string name="settings_ai_section">Thông minh nhân tạo</string>
@@ -83,14 +90,14 @@
     <string name="ai_apikey_hint">API Key</string>
     <string name="ai_btn_save_key">Lưu cấu hình API</string>
     <string name="ai_note_key_security">Lưu ý: API Key của bạn được lưu trữ an toàn trên thiết bị và chỉ được gửi trực tiếp tới máy chủ cung cấp.</string>
-    <string name="ai_loading">Đang tải...</string>
+    <string name="ai_loading">Đang tải…</string>
     <string name="ai_err_exchange_rate">Không thể tải tỷ giá ngoại tệ hiện tại.</string>
     <string name="ai_err_select_provider">Vui lòng chọn loại Provider</string>
     <string name="ai_err_enter_key">Vui lòng nhập API Key</string>
     <string name="ai_msg_key_saved">Đã lưu API Key cho %1$s</string>
     <string name="ai_err_login_required">Vui lòng đăng nhập để thanh toán</string>
-    <string name="ai_msg_payment_processing">Đang xử lý...</string>
-    <string name="ai_msg_payment_pending">Đã gửi yêu cầu đối soát! Đang đợi duyệt...</string>
+    <string name="ai_msg_payment_processing">Đang xử lý…</string>
+    <string name="ai_msg_payment_pending">Đã gửi yêu cầu đối soát! Đang đợi duyệt…</string>
     <string name="ai_err_connection">Lỗi kết nối. Vui lòng thử lại sau.</string>
     <string name="ai_toast_payment_title">Thanh toán %1$s</string>
 
@@ -98,4 +105,30 @@
     <string name="home_total_expenses">Tổng Chi Tiêu</string>
     <string name="home_comparison_mock">+5% so với tháng trước</string>
     <string name="home_recent_transactions">Giao dịch gần đây</string>
+
+    <!-- Profile Fragment -->
+    <string name="guest">Khách</string>
+    <string name="please_login_to_sync">Vui lòng đăng nhập để đồng bộ</string>
+    <!-- Settings Permissions -->
+    <string name="settings_permissions_storage">Quyền Bộ nhớ &amp; Thư viện ảnh</string>
+    <string name="settings_permissions_mic">Quyền truy cập Micrô</string>
+    <string name="settings_permissions_camera">Quyền truy cập Camera</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="you_must_login_to_configure">Bạn cần đăng nhập để thiết lập AI.</string>
+
+
+    <!-- Profile Delete Account -->
+    <string name="profile_delete_account">Xóa tài khoản</string>
+    <string name="profile_delete_title">Cảnh báo: Xóa tài khoản</string>
+    <string name="profile_delete_message">Hành động này là VĨNH VIỄN. Toàn bộ dữ liệu chi tiêu và lịch sử trò chuyện AI của bạn sẽ bị xóa hoàn toàn.\n\nGõ \"delete\" xuống dưới và tích chọn để xác nhận.</string>
+    <string name="profile_delete_hint">Gõ \"delete\"</string>
+    <string name="profile_delete_keyword">delete</string>
+    <string name="profile_delete_confirm">Tôi hiểu rằng dữ liệu của tôi sẽ bị mất</string>
+    <string name="profile_delete_invalid">Bạn phải gõ \"delete\" và tích chọn xác nhận.</string>
+
+
+    <string name="currency">Mệnh giá</string>
+    <string name="get_started">Bắt đầu</string>
+
 </resources>

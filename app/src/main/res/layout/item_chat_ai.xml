@@ -14,11 +14,19 @@
         android:orientation="vertical"
         android:padding="12dp">
         
+        <ImageView
+            android:id="@+id/ivAiImage"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
+
         <TextView
             android:id="@+id/tvAiMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#333333"
+            android:textColor="?android:attr/textColorPrimary"
             android:text="AI response placeholder"
             android:textSize="16sp" />
     </LinearLayout>

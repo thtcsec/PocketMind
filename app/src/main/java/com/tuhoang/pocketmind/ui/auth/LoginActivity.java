@@ -2,12 +2,7 @@ package com.tuhoang.pocketmind.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.view.Gravity;
-import android.app.AlertDialog;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,9 +19,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tuhoang.pocketmind.R;
-import com.tuhoang.pocketmind.MainActivity;
 import com.tuhoang.pocketmind.databinding.ActivityLoginBinding;
 import com.tuhoang.pocketmind.utils.AppLogger;
+import com.tuhoang.pocketmind.utils.LoadingDialog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-    private AlertDialog loadingDialog;
+    private LoadingDialog loadingDialog;
 
     private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -66,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
+        loadingDialog = new LoadingDialog(this);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -84,11 +80,11 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
             
-            showLoading(getString(R.string.action_logging_in));
+            loadingDialog.show(getString(R.string.action_logging_in));
 
             mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
-                    hideLoading();
+                    loadingDialog.dismiss();
                     if (task.isSuccessful()) {
                         AppLogger.d("signInWithEmail:success");
                         Toast.makeText(LoginActivity.this, getString(R.string.auth_login_success), Toast.LENGTH_SHORT).show();
@@ -121,12 +117,12 @@ public class LoginActivity extends AppCompatActivity {
                         if (user != null) {
                             checkAndCreateFirestoreUser(user);
                         } else {
-                            hideLoading();
+                            loadingDialog.dismiss();
                             Toast.makeText(LoginActivity.this, getString(R.string.auth_google_login_success), Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     } else {
-                        hideLoading();
+                        loadingDialog.dismiss();
                         AppLogger.e("LoginActivity", "signInWithCredential:failure", task.getException());
                         Toast.makeText(LoginActivity.this, getString(R.string.auth_google_login_failed), Toast.LENGTH_SHORT).show();
                     }
@@ -151,59 +147,28 @@ public class LoginActivity extends AppCompatActivity {
                         db.collection("users").document(user.getUid())
                             .set(userData)
                             .addOnSuccessListener(aVoid -> {
-                                hideLoading();
+                                loadingDialog.dismiss();
                                 AppLogger.d("User doc created via Google SignIn");
                                 Toast.makeText(LoginActivity.this, getString(R.string.auth_google_login_success), Toast.LENGTH_SHORT).show();
                                 finish();
                             })
                             .addOnFailureListener(e -> {
-                                hideLoading();
+                                loadingDialog.dismiss();
                                 AppLogger.e("LoginActivity", "Failed to init user", e);
                                 Toast.makeText(LoginActivity.this, getString(R.string.auth_err_init_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
                                 finish();
                             });
                     } else {
-                        hideLoading();
+                        loadingDialog.dismiss();
                         Toast.makeText(LoginActivity.this, getString(R.string.auth_google_login_success), Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 } else {
-                    hideLoading();
+                    loadingDialog.dismiss();
                     AppLogger.e("LoginActivity", "Firestore get failed", task.getException());
                     Toast.makeText(LoginActivity.this, getString(R.string.auth_google_login_success), Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
-    }
-
-    private void showLoading(String message) {
-        if (loadingDialog == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setCancelable(false);
-            
-            LinearLayout layout = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.HORIZONTAL);
-            layout.setPadding(50, 50, 50, 50);
-            layout.setGravity(Gravity.CENTER_VERTICAL);
-            
-            ProgressBar pb = new ProgressBar(this);
-            layout.addView(pb);
-            
-            TextView tv = new TextView(this);
-            tv.setText(message);
-            tv.setTextSize(16);
-            tv.setPadding(30, 0, 0, 0);
-            layout.addView(tv);
-            
-            builder.setView(layout);
-            loadingDialog = builder.create();
-        }
-        loadingDialog.show();
-    }
-
-    private void hideLoading() {
-        if (loadingDialog != null && loadingDialog.isShowing()) {
-            loadingDialog.dismiss();
-        }
     }
 }

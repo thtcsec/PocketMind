@@ -102,7 +102,7 @@ public class AiSettingsActivity extends AppCompatActivity {
         tvLoading.setPadding(16, 16, 16, 16);
         binding.llPocketMindPlans.addView(tvLoading);
 
-        FirebaseFirestore.getInstance().collection("pocketmind_ai_plans_collection").get()
+        FirebaseFirestore.getInstance().collection("ai_plans").get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 binding.llPocketMindPlans.removeAllViews();
                 
@@ -134,7 +134,7 @@ public class AiSettingsActivity extends AppCompatActivity {
             Boolean isActive = doc.getBoolean("is_active");
             if (isActive == null || !isActive) continue;
 
-            String id = doc.getString("id");
+            String id = doc.getId(); // Use document ID natively
             String name = doc.getString("name");
             
             Double priceUsd = 0.0;
@@ -304,8 +304,9 @@ public class AiSettingsActivity extends AppCompatActivity {
         
         Map<String, Object> transaction = new HashMap<>();
         transaction.put("userId", userId);
-        transaction.put("planType", planType);
-        transaction.put("paymentCode", paymentCode);
+        transaction.put("planId", planType);
+        transaction.put("amount_vnd", 0); // TODO: fetch actual price
+        transaction.put("provider", "manual");
         transaction.put("status", "pending");
         transaction.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
 

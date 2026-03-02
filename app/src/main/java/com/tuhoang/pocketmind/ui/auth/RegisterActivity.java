@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.tuhoang.pocketmind.R;
 import com.tuhoang.pocketmind.databinding.ActivityRegisterBinding;
 import com.tuhoang.pocketmind.utils.AppLogger;
+import com.tuhoang.pocketmind.utils.LoadingDialog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private ActivityRegisterBinding binding;
     private FirebaseAuth mAuth;
-    private AlertDialog loadingDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
+        loadingDialog = new LoadingDialog(this);
 
         binding.btnRegister.setOnClickListener(v -> {
             String name = binding.etName.getText().toString().trim();
@@ -54,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            showLoading(getString(R.string.action_registering));
+            loadingDialog.show(getString(R.string.action_registering));
 
             mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -84,25 +86,25 @@ public class RegisterActivity extends AppCompatActivity {
                                                 .document(user.getUid())
                                                 .set(userData)
                                                 .addOnSuccessListener(aVoid -> {
-                                                    hideLoading();
+                                                    loadingDialog.dismiss();
                                                     AppLogger.d("User doc created in Firestore");
                                                     Toast.makeText(RegisterActivity.this, getString(R.string.auth_register_success), Toast.LENGTH_SHORT).show();
                                                     finish();
                                                 })
                                                 .addOnFailureListener(e -> {
-                                                    hideLoading();
+                                                    loadingDialog.dismiss();
                                                     AppLogger.e("RegisterActivity", "Failed to create user doc", e);
                                                     Toast.makeText(RegisterActivity.this, getString(R.string.auth_err_init_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
                                                 });
                                         } else {
-                                            hideLoading();
+                                            loadingDialog.dismiss();
                                         }
                                     });
                         } else {
-                            hideLoading();
+                            loadingDialog.dismiss();
                         }
                     } else {
-                        hideLoading();
+                        loadingDialog.dismiss();
                         AppLogger.e("RegisterActivity", "createUserWithEmail:failure", task.getException());
                         Toast.makeText(RegisterActivity.this, getString(R.string.auth_register_failed, task.getException().getMessage()),
                                 Toast.LENGTH_SHORT).show();
@@ -113,36 +115,5 @@ public class RegisterActivity extends AppCompatActivity {
         binding.tvLoginLink.setOnClickListener(v -> {
             finish();
         });
-    }
-
-    private void showLoading(String message) {
-        if (loadingDialog == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setCancelable(false);
-            
-            LinearLayout layout = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.HORIZONTAL);
-            layout.setPadding(50, 50, 50, 50);
-            layout.setGravity(Gravity.CENTER_VERTICAL);
-            
-            ProgressBar pb = new ProgressBar(this);
-            layout.addView(pb);
-            
-            TextView tv = new TextView(this);
-            tv.setText(message);
-            tv.setTextSize(16);
-            tv.setPadding(30, 0, 0, 0);
-            layout.addView(tv);
-            
-            builder.setView(layout);
-            loadingDialog = builder.create();
-        }
-        loadingDialog.show();
-    }
-
-    private void hideLoading() {
-        if (loadingDialog != null && loadingDialog.isShowing()) {
-            loadingDialog.dismiss();
-        }
     }
 }

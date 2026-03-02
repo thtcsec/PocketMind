@@ -19,6 +19,24 @@ import com.tuhoang.pocketmind.ui.auth.LoginActivity;
 import com.tuhoang.pocketmind.ui.settings.SettingsActivity;
 import com.tuhoang.pocketmind.utils.AppLogger;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import com.tuhoang.pocketmind.databinding.FragmentProfileBinding;
+import com.tuhoang.pocketmind.ui.auth.LoginActivity;
+import com.tuhoang.pocketmind.ui.settings.SettingsActivity;
+import com.tuhoang.pocketmind.utils.AppLogger;
+
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private FirebaseAuth mAuth;
@@ -42,6 +60,8 @@ public class ProfileFragment extends Fragment {
             startActivity(new Intent(requireContext(), LoginActivity.class));
         });
 
+        binding.btnWorkerSync.setOnClickListener(v -> showWorkerSyncDialog());
+
         binding.btnLogout.setOnClickListener(v -> {
             new AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.profile_logout_title))
@@ -55,6 +75,74 @@ public class ProfileFragment extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    private void showWorkerSyncDialog() {
+        Context context = requireContext();
+        SharedPreferences prefs = context.getSharedPreferences("PocketMindPrefs", Context.MODE_PRIVATE);
+        String currentUrl = prefs.getString("PREF_WORKER_URL", "https://pocketmind-admin-worker.pocketmind.workers.dev");
+
+        EditText input = new EditText(context);
+        input.setText(currentUrl);
+        input.setHint("Enter Worker URL");
+        input.setPadding(40, 40, 40, 40);
+
+        new AlertDialog.Builder(context)
+                .setTitle("Cloudflare Worker Sync")
+                .setMessage("Enter your worker URL to fetch the latest AI Models and Pricing.")
+                .setView(input)
+                .setPositiveButton("Sync", (dialog, which) -> {
+                    String url = input.getText().toString().trim();
+                    if (!url.isEmpty()) {
+                        prefs.edit().putString("PREF_WORKER_URL", url).apply();
+                        performApiSync(url);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void performApiSync(String baseUrl) {
+        String endpoint = baseUrl + (baseUrl.endsWith("/") ? "api/models" : "/api/models");
+        
+        Toast loadingToast = Toast.makeText(requireContext(), "Syncing AI Models...", Toast.LENGTH_SHORT);
+        loadingToast.show();
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        
+        executor.execute(() -> {
+            try {
+                URL url = new URL(endpoint);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(5000);
+                
+                int code = conn.getResponseCode();
+                if (code == 200) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
+                    in.close();
+                    
+                    String json = response.toString();
+                    
+                    handler.post(() -> {
+                        SharedPreferences prefs = requireContext().getSharedPreferences("PocketMindPrefs", Context.MODE_PRIVATE);
+                        prefs.edit().putString("PREF_AI_MODELS_CACHE", json).apply();
+                        Toast.makeText(requireContext(), "Sync Successful! Models Cached.", Toast.LENGTH_LONG).show();
+                    });
+                } else {
+                    handler.post(() -> Toast.makeText(requireContext(), "Sync Error: HTTP " + code, Toast.LENGTH_LONG).show());
+                }
+            } catch (Exception e) {
+                AppLogger.e("ProfileFragment", "Worker Sync Failed", e);
+                handler.post(() -> Toast.makeText(requireContext(), "Sync Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
     }
 
     @Override

@@ -5,22 +5,48 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- Filter -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilMonthFilter"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="0dp"
+    <!-- Date Range Selector -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardDateRange"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Select Month"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-        <AutoCompleteTextView
-            android:id="@+id/acMonthFilter"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_today"
+                app:tint="?attr/colorPrimary" />
+
+            <TextView
+                android:id="@+id/tvDateRange"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="Select Date Range"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/arrow_down_float"
+                app:tint="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Summary Cards -->
     <LinearLayout
@@ -30,7 +56,7 @@
         android:orientation="horizontal"
         android:weightSum="2"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tilMonthFilter"
+        app:layout_constraintTop_toBottomOf="@id/cardDateRange"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         
@@ -39,7 +65,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            app:cardBackgroundColor="@color/green">
+            app:cardBackgroundColor="@color/green"
+            app:cardCornerRadius="16dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -55,7 +82,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            app:cardBackgroundColor="@color/red">
+            app:cardBackgroundColor="@color/red"
+            app:cardCornerRadius="16dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,27 +95,72 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <!-- Top Category Label -->
-    <TextView
-        android:id="@+id/tvTopCategory"
-        android:layout_width="wrap_content"
+    <!-- Top Category & Chart Toggle -->
+    <LinearLayout
+        android:id="@+id/llChartHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="16dp"
-        android:text="Top Spending Category: None"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/llSummary"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/llSummary">
 
-    <!-- Bar Chart -->
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/barChart"
+        <TextView
+            android:id="@+id/tvTopCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Top Category: None"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleChartType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@id/btnBarChart">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBarChart"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bar" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPieChart"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pie" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </LinearLayout>
+
+    <!-- Charts Container -->
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTopCategory"
+        app:layout_constraintTop_toBottomOf="@id/llChartHeader"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

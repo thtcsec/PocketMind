@@ -5,7 +5,7 @@
 ```bash
 npm install -g firebase-tools
 firebase login
-firebase use pocketmind-ceb5e
+firebase use pocketmind-tuhoang
 firebase deploy --only firestore:rules
 ```
 

@@ -1,6 +1,7 @@
 name = "pocketmind"
 main = "src/index.js"
 compatibility_date = "2026-03-01"
+account_id = "d26517432bff17b8889b98cc366c70f1"
 
 # Set secrets via: wrangler secret put FIREBASE_API_KEY
 # See README.md for full list.

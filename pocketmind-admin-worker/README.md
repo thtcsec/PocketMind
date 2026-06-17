@@ -3,7 +3,7 @@
 | Secret | Required | Description |
 |--------|----------|-------------|
 | `FIREBASE_API_KEY` | Yes | Web API key from Firebase project settings |
-| `FIREBASE_PROJECT_ID` | Yes | e.g. `pocketmind-ceb5e` |
+| `FIREBASE_PROJECT_ID` | Yes | e.g. `pocketmind-tuhoang` |
 | `FIREBASE_CLIENT_EMAIL` | Yes | Service account email for Firestore REST |
 | `FIREBASE_PRIVATE_KEY` | Yes | Service account private key PEM (`\n` escaped) |
 | `OPENAI_API_KEY` | No | Enables real LLM extraction |

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="subcat_food">
+        <item>Breakfast</item>
+        <item>Lunch</item>
+        <item>Dinner</item>
+        <item>Coffee &amp; Drinks</item>
+        <item>Snacks</item>
+        <item>Delivery</item>
+        <item>Groceries</item>
+    </string-array>
+    <string-array name="subcat_transport">
+        <item>Gas</item>
+        <item>Grab/Taxi</item>
+        <item>Bus/Train</item>
+        <item>Parking</item>
+        <item>Maintenance</item>
+    </string-array>
+    <string-array name="subcat_shopping">
+        <item>Clothes</item>
+        <item>Electronics</item>
+        <item>Home supplies</item>
+        <item>Gifts</item>
+    </string-array>
+    <string-array name="subcat_bills">
+        <item>Rent</item>
+        <item>Electricity</item>
+        <item>Water</item>
+        <item>Internet</item>
+        <item>Phone</item>
+    </string-array>
+    <string-array name="subcat_health">
+        <item>Pharmacy</item>
+        <item>Doctor</item>
+        <item>Gym</item>
+        <item>Insurance</item>
+    </string-array>
+    <string-array name="subcat_entertainment">
+        <item>Movies</item>
+        <item>Games</item>
+        <item>Travel</item>
+        <item>Events</item>
+    </string-array>
+    <string-array name="subcat_education">
+        <item>Tuition</item>
+        <item>Books</item>
+        <item>Courses</item>
+    </string-array>
+    <string-array name="subcat_salary">
+        <item>Main salary</item>
+        <item>Bonus</item>
+        <item>Freelance</item>
+    </string-array>
+    <string-array name="subcat_other">
+        <item>Miscellaneous</item>
+    </string-array>
+</resources>

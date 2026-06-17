@@ -11,7 +11,9 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_ok">OK</string>
     <string name="action_save">Save</string>
+    <string name="action_add">Add</string>
     <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
 
     <!-- Labels -->
     <string name="label_email">Email</string>
@@ -141,6 +143,10 @@
     <string name="profile_save_error_auth">Failed to update profile</string>
     <string name="profile_delete_success">Account marked for deletion. Signed out.</string>
     <string name="profile_delete_error">Failed to process account deletion</string>
+    <string name="profile_change_avatar">Change avatar</string>
+    <string name="profile_tap_avatar">Tap to change photo — crop and adjust</string>
+    <string name="profile_avatar_updated">Avatar updated</string>
+    <string name="profile_avatar_failed">Avatar upload failed: %1$s</string>
     <string name="cd_avatar">Avatar</string>
 
     <!-- Auth -->
@@ -185,7 +191,7 @@
     <!-- Report -->
     <string name="report_income">Income</string>
     <string name="report_expense">Expense</string>
-    <string name="report_top_category">Top Category: %1$s ($%2$.2f)</string>
+    <string name="report_top_category">Top category: %1$s (%2$s)</string>
     <string name="report_no_expenses">No expenses in this period</string>
     <string name="report_chart_bar">Bar</string>
     <string name="report_chart_pie">Pie</string>
@@ -282,6 +288,36 @@
     <string name="add_save_failed">Save failed: %1$s</string>
     <string name="err_invalid_amount">Please enter a valid amount.</string>
     <string name="err_category_required">Category is required.</string>
+    <string name="category_add_custom">+ Custom</string>
+    <string name="category_custom_hint">New category name</string>
+    <string name="manual_receipt_photo">Receipt photo</string>
+    <string name="manual_take_photo">Take photo</string>
+    <string name="manual_pick_gallery">Gallery</string>
+    <string name="manual_remove_photo">Remove photo</string>
+    <string name="category_parent_label">Category group</string>
+    <string name="category_detail_label">Details for %1$s</string>
+    <string name="chat_clear_title">Clear chat history?</string>
+    <string name="chat_clear_message">All AI messages will be permanently deleted. This cannot be undone.</string>
+    <string name="chat_clear_confirm">Clear all</string>
+    <string name="chat_clear_history">Clear chat history</string>
+    <string name="chat_load_older">Load older messages</string>
+    <string name="chat_options">Chat options</string>
+    <string name="home_income_label">Income: %1$s</string>
+    <string name="home_net_label">Net: %1$s</string>
+    <string name="home_tx_count">%1$d tx this month</string>
+    <string name="home_top_cat_short">Top: %1$s</string>
+    <string name="home_no_top_category">No spending yet</string>
+    <string name="home_see_report_hint">Full analytics in the Report tab</string>
+    <string name="profile_stats_title">Your stats</string>
+    <string name="profile_stat_transactions">Transactions</string>
+    <string name="profile_stat_plan">Plan</string>
+    <string name="about_title">About PocketMind</string>
+    <string name="about_version_format">v%1$s (%2$d)</string>
+    <string name="about_description">Personal finance app — track expenses, budgets, and AI-assisted entry.</string>
+    <string name="about_developer_name">Trinh Hoang Tu</string>
+    <string name="about_developer_bio">Android developer · TU Delft CS · Building PocketMind</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_linkedin">LinkedIn</string>
 
     <!-- Payment -->
     <string name="payment_sepay_qr_hint">Sepay QR URL (open in browser to pay):</string>

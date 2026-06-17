@@ -3,15 +3,27 @@ package com.tuhoang.pocketmind.utils
 import android.content.Context
 import android.content.SharedPreferences
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
 class PrefsManager private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.applicationContext
         .getSharedPreferences(PREF_SETTINGS, Context.MODE_PRIVATE)
 
+    private val _currencyFlow = MutableStateFlow(DEFAULT_CURRENCY)
+
+    init {
+        _currencyFlow.value = getCurrency()
+    }
+
     companion object {
         const val PREF_SETTINGS = "PREF_SETTINGS"
         const val PREF_THEME = "PREF_THEME"
         const val PREF_CURRENCY = "PREF_CURRENCY"
+        const val PREF_CUSTOM_CATEGORIES = "PREF_CUSTOM_CATEGORIES"
+        const val DEFAULT_CURRENCY = "VND"
         const val PREF_WORKER_URL = "PREF_WORKER_URL"
         const val PREF_OPENAI_API_KEY = "PREF_OPENAI_API_KEY"
         const val PREF_OPENAI_MODEL = "PREF_OPENAI_MODEL"
@@ -45,10 +57,24 @@ class PrefsManager private constructor(context: Context) {
     fun getTheme(defaultTheme: Int): Int = prefs.getInt(PREF_THEME, defaultTheme)
     fun setTheme(themeMode: Int) = prefs.edit().putInt(PREF_THEME, themeMode).apply()
 
-    fun getCurrency(defaultCurrency: String): String =
+    fun getCurrency(defaultCurrency: String = DEFAULT_CURRENCY): String =
         prefs.getString(PREF_CURRENCY, defaultCurrency) ?: defaultCurrency
 
-    fun setCurrency(currency: String) = prefs.edit().putString(PREF_CURRENCY, currency).apply()
+    fun currencyFlow(): StateFlow<String> = _currencyFlow.asStateFlow()
+
+    fun setCurrency(currency: String) {
+        prefs.edit().putString(PREF_CURRENCY, currency).apply()
+        _currencyFlow.value = currency
+    }
+
+    fun getCustomCategories(): List<String> {
+        val raw = prefs.getString(PREF_CUSTOM_CATEGORIES, "") ?: ""
+        return raw.split("|").map { it.trim() }.filter { it.isNotEmpty() }
+    }
+
+    fun setCustomCategories(categories: List<String>) {
+        prefs.edit().putString(PREF_CUSTOM_CATEGORIES, categories.joinToString("|")).apply()
+    }
 
     fun getWorkerUrl(): String = prefs.getString(PREF_WORKER_URL, "") ?: ""
     fun setWorkerUrl(url: String) = prefs.edit().putString(PREF_WORKER_URL, url).apply()

@@ -71,6 +71,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.vanniktech:android-image-cropper:4.7.0")
 
     debugImplementation(libs.compose.ui.tooling)
     testImplementation(libs.junit)

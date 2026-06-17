@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="subcat_food">
+        <item>Bữa sáng</item>
+        <item>Bữa trưa</item>
+        <item>Bữa tối</item>
+        <item>Cà phê &amp; đồ uống</item>
+        <item>Ăn vặt</item>
+        <item>Đặt ship</item>
+        <item>Đi chợ/siêu thị</item>
+    </string-array>
+    <string-array name="subcat_transport">
+        <item>Xăng</item>
+        <item>Grab/Taxi</item>
+        <item>Xe buýt/tàu</item>
+        <item>Gửi xe</item>
+        <item>Bảo dưỡng</item>
+    </string-array>
+    <string-array name="subcat_shopping">
+        <item>Quần áo</item>
+        <item>Điện tử</item>
+        <item>Đồ gia dụng</item>
+        <item>Quà tặng</item>
+    </string-array>
+    <string-array name="subcat_bills">
+        <item>Thuê nhà</item>
+        <item>Điện</item>
+        <item>Nước</item>
+        <item>Internet</item>
+        <item>Điện thoại</item>
+    </string-array>
+    <string-array name="subcat_health">
+        <item>Thuốc</item>
+        <item>Khám bệnh</item>
+        <item>Gym</item>
+        <item>Bảo hiểm</item>
+    </string-array>
+    <string-array name="subcat_entertainment">
+        <item>Phim</item>
+        <item>Game</item>
+        <item>Du lịch</item>
+        <item>Sự kiện</item>
+    </string-array>
+    <string-array name="subcat_education">
+        <item>Học phí</item>
+        <item>Sách</item>
+        <item>Khóa học</item>
+    </string-array>
+    <string-array name="subcat_salary">
+        <item>Lương chính</item>
+        <item>Thưởng</item>
+        <item>Freelance</item>
+    </string-array>
+    <string-array name="subcat_other">
+        <item>Chi khác</item>
+    </string-array>
+</resources>

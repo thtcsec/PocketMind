@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="preset_categories">
+        <item>Ăn uống</item>
+        <item>Di chuyển</item>
+        <item>Mua sắm</item>
+        <item>Hóa đơn</item>
+        <item>Sức khỏe</item>
+        <item>Giải trí</item>
+        <item>Giáo dục</item>
+        <item>Lương</item>
+        <item>Khác</item>
+    </string-array>
+</resources>

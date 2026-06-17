@@ -12,7 +12,9 @@
     <string name="action_cancel">Hủy</string>
     <string name="action_ok">OK</string>
     <string name="action_save">Lưu</string>
+    <string name="action_add">Thêm</string>
     <string name="action_back">Quay lại</string>
+    <string name="action_close">Đóng</string>
 
     <!-- Labels -->
     <string name="label_email">Email</string>
@@ -142,6 +144,10 @@
     <string name="profile_save_error_auth">Lỗi cập nhật Profile</string>
     <string name="profile_delete_success">Tài khoản đã chuyển sang trạng thái chờ xóa. Đã đăng xuất.</string>
     <string name="profile_delete_error">Lỗi xử lý xóa tài khoản</string>
+    <string name="profile_change_avatar">Đổi ảnh đại diện</string>
+    <string name="profile_tap_avatar">Chạm để đổi ảnh — căn chỉnh và cắt</string>
+    <string name="profile_avatar_updated">Đã cập nhật ảnh đại diện</string>
+    <string name="profile_avatar_failed">Tải ảnh thất bại: %1$s</string>
     <string name="cd_avatar">Ảnh đại diện</string>
 
     <!-- Auth -->
@@ -186,7 +192,7 @@
     <!-- Report -->
     <string name="report_income">Thu nhập</string>
     <string name="report_expense">Chi tiêu</string>
-    <string name="report_top_category">Danh mục hàng đầu: %1$s (%2$.0f đ)</string>
+    <string name="report_top_category">Danh mục hàng đầu: %1$s (%2$s)</string>
     <string name="report_no_expenses">Không có chi tiêu trong khoảng thời gian này</string>
     <string name="report_chart_bar">Cột</string>
     <string name="report_chart_pie">Tròn</string>
@@ -283,6 +289,36 @@
     <string name="add_save_failed">Lưu thất bại: %1$s</string>
     <string name="err_invalid_amount">Vui lòng nhập số tiền hợp lệ.</string>
     <string name="err_category_required">Danh mục là bắt buộc.</string>
+    <string name="category_add_custom">+ Tùy chỉnh</string>
+    <string name="category_custom_hint">Tên danh mục mới</string>
+    <string name="manual_receipt_photo">Ảnh hóa đơn</string>
+    <string name="manual_take_photo">Chụp ảnh</string>
+    <string name="manual_pick_gallery">Thư viện</string>
+    <string name="manual_remove_photo">Xóa ảnh</string>
+    <string name="category_parent_label">Nhóm danh mục</string>
+    <string name="category_detail_label">Chi tiết: %1$s</string>
+    <string name="chat_clear_title">Xóa lịch sử chat?</string>
+    <string name="chat_clear_message">Toàn bộ tin nhắn AI sẽ bị xóa vĩnh viễn. Không thể hoàn tác.</string>
+    <string name="chat_clear_confirm">Xóa hết</string>
+    <string name="chat_clear_history">Xóa lịch sử chat</string>
+    <string name="chat_load_older">Tải tin nhắn cũ hơn</string>
+    <string name="chat_options">Tùy chọn chat</string>
+    <string name="home_income_label">Thu: %1$s</string>
+    <string name="home_net_label">Còn lại: %1$s</string>
+    <string name="home_tx_count">%1$d giao dịch tháng này</string>
+    <string name="home_top_cat_short">Hàng đầu: %1$s</string>
+    <string name="home_no_top_category">Chưa có chi tiêu</string>
+    <string name="home_see_report_hint">Xem phân tích đầy đủ ở tab Báo cáo</string>
+    <string name="profile_stats_title">Thống kê</string>
+    <string name="profile_stat_transactions">Giao dịch</string>
+    <string name="profile_stat_plan">Gói</string>
+    <string name="about_title">Giới thiệu PocketMind</string>
+    <string name="about_version_format">v%1$s (%2$d)</string>
+    <string name="about_description">Ứng dụng quản lý tài chính cá nhân — theo dõi chi tiêu, ngân sách và nhập liệu AI.</string>
+    <string name="about_developer_name">Trịnh Hoàng Tú</string>
+    <string name="about_developer_bio">Lập trình viên Android · TU Delft CS · Xây dựng PocketMind</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_linkedin">LinkedIn</string>
 
     <!-- Payment -->
     <string name="payment_sepay_qr_hint">URL QR Sepay (mở trình duyệt để thanh toán):</string>

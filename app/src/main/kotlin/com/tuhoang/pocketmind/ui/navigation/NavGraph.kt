@@ -1,12 +1,16 @@
 package com.tuhoang.pocketmind.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +39,16 @@ object Routes {
     const val ADMIN = "admin"
 }
 
+private val subScreenTransitions = listOf(
+    Routes.LOGIN,
+    Routes.REGISTER,
+    Routes.FORGOT_PASSWORD,
+    Routes.SETTINGS,
+    Routes.AI_SETTINGS,
+    Routes.PROFILE_EDIT,
+    Routes.ADMIN
+)
+
 @Composable
 fun PocketMindNavHost() {
     val navController = rememberNavController()
@@ -43,11 +57,11 @@ fun PocketMindNavHost() {
     val startDestination = if (prefs.isOnboardingComplete()) Routes.MAIN else Routes.ONBOARDING
 
     ProvideAppSnackbar(snackbarHostState) {
-        Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
                 startDestination = startDestination,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.fillMaxSize()
             ) {
                 composable(Routes.ONBOARDING) {
                     OnboardingScreen(
@@ -68,29 +82,65 @@ fun PocketMindNavHost() {
                         )
                     }
                 }
-                composable(Routes.LOGIN) {
+                composable(
+                    Routes.LOGIN,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     LoginScreen(
                         onBack = { navController.popBackStack() },
                         onNavigateRegister = { navController.navigate(Routes.REGISTER) },
                         onNavigateForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) }
                     )
                 }
-                composable(Routes.FORGOT_PASSWORD) {
+                composable(
+                    Routes.FORGOT_PASSWORD,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     ForgotPasswordScreen(onBack = { navController.popBackStack() })
                 }
-                composable(Routes.REGISTER) {
+                composable(
+                    Routes.REGISTER,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     RegisterScreen(onBack = { navController.popBackStack() })
                 }
-                composable(Routes.SETTINGS) {
+                composable(
+                    Routes.SETTINGS,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     SettingsScreen(
                         onBack = { navController.popBackStack() },
                         onNavigateAiSettings = { navController.navigate(Routes.AI_SETTINGS) }
                     )
                 }
-                composable(Routes.AI_SETTINGS) {
+                composable(
+                    Routes.AI_SETTINGS,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     AiSettingsScreen(onBack = { navController.popBackStack() })
                 }
-                composable(Routes.PROFILE_EDIT) {
+                composable(
+                    Routes.PROFILE_EDIT,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     ProfileEditScreen(
                         onBack = { navController.popBackStack() },
                         onDeleted = {
@@ -100,10 +150,23 @@ fun PocketMindNavHost() {
                         }
                     )
                 }
-                composable(Routes.ADMIN) {
+                composable(
+                    Routes.ADMIN,
+                    enterTransition = { slideInFromEnd() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInFromStart() },
+                    popExitTransition = { slideOutToEnd() }
+                ) {
                     AdminDashboardScreen(onBack = { navController.popBackStack() })
                 }
             }
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = 8.dp)
+            )
         }
     }
 }

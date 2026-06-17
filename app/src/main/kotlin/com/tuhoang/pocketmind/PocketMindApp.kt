@@ -17,6 +17,7 @@ class PocketMindApp : Application() {
     override fun onCreate() {
         super.onCreate()
         PrefsManager.init(this)
+        PrefsManager.getInstance().clearLegacyApiSecrets()
         applyPersistedTheme()
         fetchGlobalConfig()
     }

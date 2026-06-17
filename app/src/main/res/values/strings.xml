@@ -92,6 +92,7 @@
     <string name="ai_apikey_hint">API Key</string>
     <string name="ai_btn_save_key">Save API Configuration</string>
     <string name="ai_note_key_security">Note: Your API key is stored securely on your device and is only transmitted directly to the provider.</string>
+    <string name="ai_note_server_managed">AI keys and limits are managed securely on PocketMind servers. No API keys are stored on this device.</string>
     <string name="ai_loading">Loading…</string>
     <string name="ai_err_exchange_rate">Could not load current exchange rate.</string>
     <string name="ai_err_select_provider">Please select a Provider</string>

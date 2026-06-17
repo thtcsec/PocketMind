@@ -93,6 +93,7 @@
     <string name="ai_apikey_hint">API Key</string>
     <string name="ai_btn_save_key">Lưu cấu hình API</string>
     <string name="ai_note_key_security">Lưu ý: API Key của bạn được lưu trữ an toàn trên thiết bị và chỉ được gửi trực tiếp tới máy chủ cung cấp.</string>
+    <string name="ai_note_server_managed">Khóa AI và giới hạn chat được quản lý trên server PocketMind. Không lưu API key trên thiết bị.</string>
     <string name="ai_loading">Đang tải…</string>
     <string name="ai_err_exchange_rate">Không thể tải tỷ giá ngoại tệ hiện tại.</string>
     <string name="ai_err_select_provider">Vui lòng chọn loại Provider</string>

@@ -20,13 +20,18 @@ object WorkerApiClient {
     data class ChatResult(
         val success: Boolean,
         val message: String?,
-        val extractedData: Map<String, Any?>?
+        val extractedData: Map<String, Any?>?,
+        val error: String? = null
     )
 
-    fun postChat(workerUrl: String, userId: String, userMessage: String): ChatResult {
+    fun postChat(workerUrl: String, idToken: String, userId: String, userMessage: String): ChatResult {
         if (workerUrl.isBlank()) {
-            return ChatResult(false, null, null)
+            return ChatResult(false, null, null, "Worker URL not configured")
         }
+        if (idToken.isBlank()) {
+            return ChatResult(false, null, null, "Not authenticated")
+        }
+
         val url = workerUrl.trimEnd('/') + "/api/chat"
         val body = JSONObject().apply {
             put("userId", userId)
@@ -40,14 +45,17 @@ object WorkerApiClient {
         }
         val request = Request.Builder()
             .url(url)
+            .addHeader("Authorization", "Bearer $idToken")
             .post(body.toString().toRequestBody(jsonMedia))
             .build()
 
         return client.newCall(request).execute().use { response ->
             val text = response.body?.string().orEmpty()
             if (!response.isSuccessful) {
-                val err = runCatching { JSONObject(text).optString("error") }.getOrNull()
-                return ChatResult(false, err ?: "HTTP ${response.code}", null)
+                val err = runCatching {
+                    JSONObject(text).optString("error").takeIf { it.isNotEmpty() }
+                }.getOrNull()
+                return ChatResult(false, null, null, err ?: "HTTP ${response.code}")
             }
             val json = JSONObject(text)
             val success = json.optBoolean("success", false)

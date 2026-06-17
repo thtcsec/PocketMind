@@ -15,6 +15,7 @@ import com.tuhoang.pocketmind.data.repository.TransactionRepository
 import com.tuhoang.pocketmind.utils.AppLogger
 import com.tuhoang.pocketmind.utils.PrefsManager
 import com.tuhoang.pocketmind.utils.ValidationUtils
+import com.google.android.gms.tasks.Tasks
 import com.tuhoang.pocketmind.utils.WorkerApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,18 +81,21 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestAiResponse(userText: String) {
-        val uid = auth.currentUser?.uid ?: return
+        val user = auth.currentUser ?: return
+        val uid = user.uid
         val workerUrl = PrefsManager.getInstance().getWorkerUrl()
         _isAiThinking.value = true
 
         viewModelScope.launch {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    WorkerApiClient.postChat(workerUrl, uid, userText)
+                    val idToken = Tasks.await(user.getIdToken(false)).token.orEmpty()
+                    WorkerApiClient.postChat(workerUrl, idToken, uid, userText)
                 }
                 val replyText = when {
                     result.message != null -> result.message
                     result.success -> app.getString(R.string.chat_ai_saved)
+                    result.error != null -> result.error
                     workerUrl.isBlank() -> app.getString(R.string.chat_ai_response)
                     else -> app.getString(R.string.chat_ai_error)
                 }

@@ -71,13 +71,24 @@ class PrefsManager private constructor(context: Context) {
     fun setMicEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(PREF_MIC_ENABLED, enabled).apply()
 
-    fun getOpenAiApiKey(): String = prefs.getString(PREF_OPENAI_API_KEY, "") ?: ""
-    fun setOpenAiApiKey(key: String) = prefs.edit().putString(PREF_OPENAI_API_KEY, key).apply()
+    fun clearLegacyApiSecrets() {
+        prefs.edit()
+            .remove(PREF_OPENAI_API_KEY)
+            .remove(PREF_OPENAI_MODEL)
+            .apply()
+    }
 
-    fun getOpenAiModel(defaultModel: String): String =
-        prefs.getString(PREF_OPENAI_MODEL, defaultModel) ?: defaultModel
+    @Deprecated("API keys are managed server-side on the Worker")
+    fun getOpenAiApiKey(): String = ""
 
-    fun setOpenAiModel(model: String) = prefs.edit().putString(PREF_OPENAI_MODEL, model).apply()
+    @Deprecated("API keys are managed server-side on the Worker")
+    fun setOpenAiApiKey(key: String) = Unit
+
+    @Deprecated("API keys are managed server-side on the Worker")
+    fun getOpenAiModel(defaultModel: String): String = defaultModel
+
+    @Deprecated("API keys are managed server-side on the Worker")
+    fun setOpenAiModel(model: String) = Unit
 
     fun isAiTranslationEnabled(): Boolean = prefs.getBoolean(PREF_AI_TRANSLATION_ENABLED, false)
     fun setAiTranslationEnabled(enabled: Boolean) =

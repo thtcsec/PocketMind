@@ -58,8 +58,8 @@ import com.tuhoang.pocketmind.ui.theme.GreenPrimary
 import com.tuhoang.pocketmind.ui.theme.RedExpense
 import com.tuhoang.pocketmind.utils.CsvExporter
 import com.tuhoang.pocketmind.utils.HapticUtils
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
+import com.tuhoang.pocketmind.utils.MoneyFormatter
+import com.tuhoang.pocketmind.utils.rememberMoneyFormatter
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
@@ -86,7 +86,8 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
     LaunchedEffect(Unit) { viewModel.fetchReportData() }
 
     val loadingSuffix = stringResource(R.string.report_loading_suffix)
-    val sdf = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
+    val money = rememberMoneyFormatter()
+    val sdf = remember { java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()) }
     val dateRangeText = buildString {
         val start = startDate
         val end = endDate
@@ -100,7 +101,6 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
 
     val topCategory = categoryExpenses.maxByOrNull { it.value }
     val categories = remember(categoryExpenses) { categoryExpenses.keys.sorted() }
-    val formatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     fun exportCsv() {
         HapticUtils.performClick(context)
@@ -230,20 +230,24 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             SummaryCard(
                                 stringResource(R.string.report_income),
-                                formatter.format(totalIncome),
+                                money.format(totalIncome),
                                 GreenPrimary,
                                 Modifier.weight(1f)
                             )
                             SummaryCard(
                                 stringResource(R.string.report_expense),
-                                formatter.format(totalExpense),
+                                money.format(totalExpense),
                                 RedExpense,
                                 Modifier.weight(1f)
                             )
                         }
                         Text(
                             text = topCategory?.let {
-                                stringResource(R.string.report_top_category, it.key, it.value)
+                                stringResource(
+                                    R.string.report_top_category,
+                                    it.key,
+                                    money.format(it.value)
+                                )
                             } ?: stringResource(R.string.report_no_expenses),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(top = 12.dp)
@@ -291,7 +295,7 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
                 }
 
                 items(filteredTransactions) { tx ->
-                    TransactionRow(tx, formatter)
+                    TransactionRow(tx, money)
                 }
             }
         }
@@ -299,7 +303,7 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
 }
 
 @Composable
-private fun TransactionRow(transaction: Transaction, formatter: NumberFormat) {
+private fun TransactionRow(transaction: Transaction, money: MoneyFormatter) {
     val isIncome = transaction.type.equals("income", ignoreCase = true)
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -316,7 +320,10 @@ private fun TransactionRow(transaction: Transaction, formatter: NumberFormat) {
                 }
             }
             Text(
-                text = "${if (isIncome) "+" else "-"}${formatter.format(transaction.amount)}",
+                text = money.format(
+                    if (isIncome) transaction.amount else -transaction.amount,
+                    signed = true
+                ),
                 color = if (isIncome) GreenPrimary else RedExpense,
                 fontWeight = FontWeight.Bold
             )

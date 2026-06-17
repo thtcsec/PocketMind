@@ -1,7 +1,9 @@
 package com.tuhoang.pocketmind.ui.profile
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,10 +14,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +30,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,14 +41,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.tuhoang.pocketmind.R
+import com.tuhoang.pocketmind.ui.components.AboutDialog
 import com.tuhoang.pocketmind.ui.components.SectionCard
+import com.tuhoang.pocketmind.utils.AppInfo
 
 @Composable
 fun ProfileScreen(
@@ -50,11 +64,26 @@ fun ProfileScreen(
     onNavigateAdmin: () -> Unit,
     viewModel: ProfileViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val user by viewModel.currentUser.collectAsState()
     val role by viewModel.userRole.collectAsState()
+    val stats by viewModel.stats.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val versionInfo = remember { AppInfo.versionInfo(context) }
 
     LaunchedEffect(Unit) { viewModel.fetchUserData() }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.fetchUserData()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     if (showLogoutDialog) {
         AlertDialog(
@@ -65,7 +94,7 @@ fun ProfileScreen(
                 TextButton(onClick = {
                     viewModel.logout()
                     showLogoutDialog = false
-                }) { Text(stringResource(R.string.profile_logout_title)) }
+                }) { Text(stringResource(R.string.action_logout)) }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
@@ -73,6 +102,10 @@ fun ProfileScreen(
                 }
             }
         )
+    }
+
+    if (showAboutDialog) {
+        AboutDialog(onDismiss = { showAboutDialog = false })
     }
 
     Column(
@@ -115,6 +148,28 @@ fun ProfileScreen(
             }
         }
 
+        if (user != null) {
+            SectionCard(title = stringResource(R.string.profile_stats_title)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    StatCard(
+                        icon = { Icon(Icons.Default.Insights, contentDescription = null) },
+                        value = stats.transactionCount.toString(),
+                        label = stringResource(R.string.profile_stat_transactions),
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatCard(
+                        icon = { Icon(Icons.Default.Verified, contentDescription = null) },
+                        value = stats.planName,
+                        label = stringResource(R.string.profile_stat_plan),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
         if (user == null) {
             Button(onClick = onNavigateLogin, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.action_login))
@@ -146,6 +201,68 @@ fun ProfileScreen(
                     }
                 }
             }
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showAboutDialog = true },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+            )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.about_title),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = stringResource(R.string.about_version_format, versionInfo.versionName, versionInfo.versionCode),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatCard(
+    icon: @Composable () -> Unit,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            icon()
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 6.dp)
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

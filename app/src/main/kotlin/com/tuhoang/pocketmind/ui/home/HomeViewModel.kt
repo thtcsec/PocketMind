@@ -40,10 +40,7 @@ class HomeViewModel : ViewModel() {
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-
     private val _categoryFilter = MutableStateFlow<String?>(null)
-    val categoryFilter: StateFlow<String?> = _categoryFilter.asStateFlow()
 
     val monthlyBudget: StateFlow<Double> get() = budget
 
@@ -59,26 +56,22 @@ class HomeViewModel : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BudgetAlert.NONE)
 
-    val recentTransactions: StateFlow<List<Transaction>> = combine(
-        _allTransactions,
-        _searchQuery,
-        _categoryFilter
-    ) { list, query, category ->
-        list.filter { tx ->
-            val matchesQuery = query.isBlank() ||
-                tx.category?.contains(query, ignoreCase = true) == true ||
-                tx.note?.contains(query, ignoreCase = true) == true
-            val matchesCategory = category.isNullOrBlank() || tx.category.equals(category, ignoreCase = true)
-            matchesQuery && matchesCategory
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _monthlyTxCount = MutableStateFlow(0)
+    val monthlyTxCount: StateFlow<Int> = _monthlyTxCount.asStateFlow()
 
-    val availableCategories: StateFlow<List<String>> = _allTransactions
-        .map { list -> list.mapNotNull { it.category }.distinct().sorted() }
+    private val _monthlyIncome = MutableStateFlow(0.0)
+    val monthlyIncome: StateFlow<Double> = _monthlyIncome.asStateFlow()
+
+    private val _topCategory = MutableStateFlow<String?>(null)
+    val topCategory: StateFlow<String?> = _topCategory.asStateFlow()
+
+    val monthlyNet: StateFlow<Double> = combine(_monthlyIncome, _totalMonthlyExpense) { income, expense ->
+        income - expense
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+
+    val recentPreview: StateFlow<List<Transaction>> = _allTransactions
+        .map { it.take(5) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun setSearchQuery(query: String) { _searchQuery.value = query }
-    fun setCategoryFilter(category: String?) { _categoryFilter.value = category }
     fun refreshBudget() { _budgetValue.value = prefs.getMonthlyBudget() }
 
     fun fetchHomeData(refreshing: Boolean = false) {
@@ -121,19 +114,27 @@ class HomeViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { snapshots ->
                 var totalExpense = 0.0
+                var totalIncome = 0.0
+                var txCount = 0
                 val categoryMap = mutableMapOf<String, Double>()
 
                 for (doc in snapshots) {
                     val t = doc.toObject(Transaction::class.java) ?: continue
+                    txCount++
                     if (t.type.equals("expense", ignoreCase = true)) {
                         totalExpense += t.amount
                         val cat = t.category ?: "Other"
                         categoryMap[cat] = (categoryMap[cat] ?: 0.0) + t.amount
+                    } else if (t.type.equals("income", ignoreCase = true)) {
+                        totalIncome += t.amount
                     }
                 }
 
                 _totalMonthlyExpense.value = totalExpense
+                _monthlyIncome.value = totalIncome
+                _monthlyTxCount.value = txCount
                 _categoryExpenses.value = categoryMap
+                _topCategory.value = categoryMap.maxByOrNull { it.value }?.key
             }
             .addOnFailureListener { e ->
                 AppLogger.e("HomeViewModel", "Failed to fetch monthly expenses", e)

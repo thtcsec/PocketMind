@@ -26,7 +26,7 @@ import com.tuhoang.pocketmind.utils.PrefsManager
 @Composable
 fun DataStorageSettingsSection(prefs: PrefsManager) {
     val context = LocalContext.current
-    var currency by remember { mutableStateOf(prefs.getCurrency("USD")) }
+    var currency by remember { mutableStateOf(prefs.getCurrency()) }
     var showCurrencyDialog by remember { mutableStateOf(false) }
     var showBudgetDialog by remember { mutableStateOf(false) }
     var budgetInput by remember { mutableStateOf(prefs.getMonthlyBudget().toLong().toString()) }

@@ -113,11 +113,11 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
         var limit by remember { mutableStateOf(userDoc.getLong("ai_chat_limit")?.toString() ?: "5") }
         AlertDialog(
             onDismissRequest = { editUser = null },
-            title = { Text("Edit User: ${userDoc.getString("name")}") },
+            title = { Text(stringResource(R.string.admin_edit_user_title, userDoc.getString("name") ?: "")) },
             text = {
                 Column {
-                    OutlinedTextField(value = role, onValueChange = { role = it }, label = { Text("Role (user/admin)") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = limit, onValueChange = { limit = it }, label = { Text("AI Chat Limit") }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+                    OutlinedTextField(value = role, onValueChange = { role = it }, label = { Text(stringResource(R.string.admin_role_label)) }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = limit, onValueChange = { limit = it }, label = { Text(stringResource(R.string.admin_limit_label)) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
                 }
             },
             confirmButton = {
@@ -128,12 +128,12 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
                     if (updates.isNotEmpty()) {
                         db.collection("users").document(userDoc.id).update(updates)
                             .addOnSuccessListener {
-                                Toast.makeText(context, "User updated", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.admin_user_updated, Toast.LENGTH_SHORT).show()
                                 editUser = null
                                 loadUsers(db) { users = it }
                             }
                     }
-                }) { Text("Save") }
+                }) { Text(stringResource(R.string.action_save)) }
             },
             dismissButton = { TextButton(onClick = { editUser = null }) { Text(stringResource(R.string.action_cancel)) } }
         )
@@ -142,14 +142,14 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
     if (showWorkerDialog) {
         AlertDialog(
             onDismissRequest = { showWorkerDialog = false },
-            title = { Text("System Global Config") },
+            title = { Text(stringResource(R.string.admin_global_config_title)) },
             text = {
                 Column {
-                    Text("Update the Cloudflare Worker URL globally for ALL users.")
+                    Text(stringResource(R.string.admin_global_config_desc))
                     OutlinedTextField(
                         value = workerUrl,
                         onValueChange = { workerUrl = it },
-                        label = { Text("Worker URL") },
+                        label = { Text(stringResource(R.string.admin_worker_url_label)) },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     )
                 }
@@ -163,11 +163,11 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
                         )
                         db.collection("system_configs").document("global").set(data, SetOptions.merge())
                             .addOnSuccessListener {
-                                Toast.makeText(context, "Global Worker URL updated!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.admin_worker_updated, Toast.LENGTH_SHORT).show()
                                 showWorkerDialog = false
                             }
                     }
-                }) { Text("Save Globally") }
+                }) { Text(stringResource(R.string.admin_save_globally)) }
             },
             dismissButton = { TextButton(onClick = { showWorkerDialog = false }) { Text(stringResource(R.string.action_cancel)) } }
         )
@@ -179,7 +179,7 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
                 title = { Text(stringResource(R.string.admin_dashboard_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 actions = {
@@ -192,7 +192,7 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
                                 isLoading = false
                             }
                     }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Config Worker")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.admin_config_worker))
                     }
                 }
             )
@@ -218,10 +218,18 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
                     items(users) { doc ->
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text(doc.getString("name") ?: "Unknown", style = MaterialTheme.typography.titleMedium)
-                                Text(doc.getString("email") ?: "No Email", style = MaterialTheme.typography.bodySmall)
-                                Text("Role: ${doc.getString("role") ?: "user"} | Limit: ${doc.getLong("ai_chat_limit") ?: "?"}")
-                                Button(onClick = { editUser = doc }, modifier = Modifier.padding(top = 8.dp)) { Text("Edit") }
+                                Text(doc.getString("name") ?: stringResource(R.string.admin_unknown), style = MaterialTheme.typography.titleMedium)
+                                Text(doc.getString("email") ?: stringResource(R.string.admin_no_email), style = MaterialTheme.typography.bodySmall)
+                                Text(
+                                    stringResource(
+                                        R.string.admin_user_role_limit,
+                                        doc.getString("role") ?: "user",
+                                        doc.getLong("ai_chat_limit")?.toString() ?: "?"
+                                    )
+                                )
+                                Button(onClick = { editUser = doc }, modifier = Modifier.padding(top = 8.dp)) {
+                                    Text(stringResource(R.string.admin_edit))
+                                }
                             }
                         }
                     }
@@ -232,17 +240,21 @@ fun AdminDashboardScreen(onBack: () -> Unit) {
                         val isActive = doc.getBoolean("is_active") ?: false
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text(doc.getString("name") ?: "Unknown Plan", style = MaterialTheme.typography.titleMedium)
+                                Text(doc.getString("name") ?: stringResource(R.string.admin_unknown_plan), style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    if (isActive) "Active" else "Inactive",
+                                    if (isActive) stringResource(R.string.admin_plan_active) else stringResource(R.string.admin_plan_inactive),
                                     color = if (isActive) Color(0xFF4CAF50) else Color(0xFFF44336)
                                 )
                                 Button(
                                     onClick = {
-                                        Toast.makeText(context, "Edit Plan: ${doc.getString("name")}", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.admin_edit_plan_toast, doc.getString("name") ?: ""),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     },
                                     modifier = Modifier.padding(top = 8.dp)
-                                ) { Text("Edit") }
+                                ) { Text(stringResource(R.string.admin_edit)) }
                             }
                         }
                     }

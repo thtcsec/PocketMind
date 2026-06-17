@@ -17,7 +17,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tuhoang.pocketmind.R
 private val ChartColors = listOf(
     Color(0xFF4CAF50),
     Color(0xFF2196F3),
@@ -37,7 +39,7 @@ fun PieChart(
 ) {
     if (data.isEmpty()) {
         Box(modifier = modifier.height(200.dp), contentAlignment = Alignment.Center) {
-            Text("No data", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.chart_no_data), style = MaterialTheme.typography.bodyMedium)
         }
         return
     }
@@ -81,7 +83,7 @@ fun BarChart(
 ) {
     if (data.isEmpty()) {
         Box(modifier = modifier.height(200.dp), contentAlignment = Alignment.Center) {
-            Text("No data", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.chart_no_data), style = MaterialTheme.typography.bodyMedium)
         }
         return
     }

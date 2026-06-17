@@ -65,7 +65,7 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
     }
 
     if (isLoading) {
-        LoadingOverlay("Đang xử lý...")
+        LoadingOverlay(stringResource(R.string.profile_processing))
         return
     }
 
@@ -102,12 +102,12 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
                             auth.signOut()
                             isLoading = false
                             showDeleteDialog = false
-                            Toast.makeText(context, "Tài khoản đã chuyển sang trạng thái chờ xóa.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, R.string.profile_delete_success, Toast.LENGTH_LONG).show()
                             onDeleted()
                         }
                         .addOnFailureListener {
                             isLoading = false
-                            Toast.makeText(context, "Lỗi xử lý xóa tài khoản", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.profile_delete_error, Toast.LENGTH_SHORT).show()
                         }
                 }) { Text(stringResource(R.string.profile_delete_account)) }
             },
@@ -122,10 +122,10 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Profile") },
+                title = { Text(stringResource(R.string.profile_edit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )
@@ -138,14 +138,14 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
             if (user.photoUrl != null) {
                 AsyncImage(
                     model = user.photoUrl,
-                    contentDescription = "Avatar",
+                    contentDescription = stringResource(R.string.cd_avatar),
                     modifier = Modifier.size(80.dp).clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
             } else {
                 Icon(
                     painter = painterResource(R.drawable.ic_profile),
-                    contentDescription = "Avatar",
+                    contentDescription = stringResource(R.string.cd_avatar),
                     modifier = Modifier.size(80.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -154,13 +154,13 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.label_name)) },
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             )
             OutlinedTextField(
                 value = user.email ?: "",
                 onValueChange = {},
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.label_email)) },
                 enabled = false,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
@@ -168,7 +168,7 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
             Button(
                 onClick = {
                     if (name.isBlank()) {
-                        Toast.makeText(context, "Tên không được để trống", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.profile_name_required, Toast.LENGTH_SHORT).show()
                         return@Button
                     }
                     isLoading = true
@@ -178,21 +178,21 @@ fun ProfileEditScreen(onBack: () -> Unit, onDeleted: () -> Unit) {
                             db.collection("users").document(user.uid).update("name", name)
                                 .addOnSuccessListener {
                                     isLoading = false
-                                    Toast.makeText(context, "Lưu thành công!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, R.string.profile_save_success, Toast.LENGTH_SHORT).show()
                                     onBack()
                                 }
                                 .addOnFailureListener {
                                     isLoading = false
-                                    Toast.makeText(context, "Lỗi cập nhật CSDL", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, R.string.profile_save_error_db, Toast.LENGTH_SHORT).show()
                                 }
                         } else {
                             isLoading = false
-                            Toast.makeText(context, "Lỗi cập nhật Profile", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.profile_save_error_auth, Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-            ) { Text("Save") }
+            ) { Text(stringResource(R.string.action_save)) }
 
             OutlinedButton(
                 onClick = { showDeleteDialog = true },

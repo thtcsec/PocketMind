@@ -2,10 +2,8 @@ package com.tuhoang.pocketmind.ui.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -42,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.tuhoang.pocketmind.R
+import com.tuhoang.pocketmind.ui.components.SectionCard
 
 @Composable
 fun ProfileScreen(
@@ -81,61 +80,71 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (user?.photoUrl != null) {
-            AsyncImage(
-                model = user?.photoUrl,
-                contentDescription = "Avatar",
-                modifier = Modifier.size(96.dp).clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Icon(
-                painter = painterResource(R.drawable.ic_profile),
-                contentDescription = "Avatar",
-                modifier = Modifier.size(96.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+        SectionCard(title = stringResource(R.string.title_profile)) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (user?.photoUrl != null) {
+                    AsyncImage(
+                        model = user?.photoUrl,
+                        contentDescription = stringResource(R.string.cd_avatar),
+                        modifier = Modifier.size(96.dp).clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_profile),
+                        contentDescription = stringResource(R.string.cd_avatar),
+                        modifier = Modifier.size(96.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Text(
+                    text = user?.displayName?.takeIf { !it.isNullOrEmpty() } ?: stringResource(R.string.guest),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+                Text(
+                    text = user?.email ?: stringResource(R.string.please_login_to_sync),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
-
-        Text(
-            text = user?.displayName?.takeIf { !it.isNullOrEmpty() } ?: stringResource(R.string.guest),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = user?.email ?: stringResource(R.string.please_login_to_sync),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         if (user == null) {
             Button(onClick = onNavigateLogin, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.action_login))
             }
         } else {
-            OutlinedButton(onClick = onNavigateSettings, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Settings, contentDescription = null)
-                Text(stringResource(R.string.title_settings), modifier = Modifier.padding(start = 8.dp))
-            }
-            OutlinedButton(onClick = onNavigateProfileEdit, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Person, contentDescription = null)
-                Text("Edit Profile", modifier = Modifier.padding(start = 8.dp))
-            }
+            SectionCard(title = stringResource(R.string.section_account_actions)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onNavigateSettings, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Default.Settings, contentDescription = null)
+                        Text(stringResource(R.string.title_settings), modifier = Modifier.padding(start = 8.dp))
+                    }
+                    OutlinedButton(onClick = onNavigateProfileEdit, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Default.Person, contentDescription = null)
+                        Text(stringResource(R.string.profile_edit_title), modifier = Modifier.padding(start = 8.dp))
+                    }
 
-            if (role == "admin") {
-                HorizontalDivider()
-                OutlinedButton(onClick = onNavigateAdmin, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.AdminPanelSettings, contentDescription = null)
-                    Text(stringResource(R.string.admin_dashboard_title), modifier = Modifier.padding(start = 8.dp))
+                    if (role == "admin") {
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                        OutlinedButton(onClick = onNavigateAdmin, modifier = Modifier.fillMaxWidth()) {
+                            Icon(Icons.Default.AdminPanelSettings, contentDescription = null)
+                            Text(stringResource(R.string.admin_dashboard_title), modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                    OutlinedButton(onClick = { showLogoutDialog = true }, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                        Text(stringResource(R.string.action_logout), modifier = Modifier.padding(start = 8.dp))
+                    }
                 }
-            }
-
-            HorizontalDivider()
-            OutlinedButton(onClick = { showLogoutDialog = true }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
-                Text(stringResource(R.string.action_logout), modifier = Modifier.padding(start = 8.dp))
             }
         }
     }

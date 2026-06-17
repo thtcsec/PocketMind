@@ -1,102 +1,96 @@
 package com.tuhoang.pocketmind.ui.auth
 
-import android.content.Intent
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tuhoang.pocketmind.R
+import com.tuhoang.pocketmind.ui.components.AuthEmailField
+import com.tuhoang.pocketmind.ui.components.AuthGoogleButton
+import com.tuhoang.pocketmind.ui.components.AuthOrDivider
+import com.tuhoang.pocketmind.ui.components.AuthPasswordField
+import com.tuhoang.pocketmind.ui.components.AuthPrimaryButton
+import com.tuhoang.pocketmind.ui.components.AuthScreenLayout
 import com.tuhoang.pocketmind.ui.components.LoadingOverlay
-import com.tuhoang.pocketmind.utils.AppLogger
+import com.tuhoang.pocketmind.ui.components.rememberShowSnackbar
+import com.tuhoang.pocketmind.utils.GoogleSignInHelper
+import com.tuhoang.pocketmind.utils.HapticUtils
+import com.tuhoang.pocketmind.utils.ValidationUtils
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onBack: () -> Unit, onNavigateRegister: () -> Unit) {
+fun LoginScreen(
+    onBack: () -> Unit,
+    onNavigateRegister: () -> Unit,
+    onNavigateForgotPassword: () -> Unit
+) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+    val scope = rememberCoroutineScope()
+    val showSnackbar = rememberShowSnackbar()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    val googleSignInClient = remember {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        GoogleSignIn.getClient(context, gso)
+    fun finishGoogleLogin(idToken: String) {
+        isLoading = true
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                checkAndCreateFirestoreUser(auth, context, onSuccess = {
+                    isLoading = false
+                    showSnackbar(context.getString(R.string.auth_google_login_success))
+                    onBack()
+                }, onError = { msg ->
+                    isLoading = false
+                    showSnackbar(msg)
+                })
+            } else {
+                isLoading = false
+                showSnackbar(context.getString(R.string.auth_google_login_failed))
+            }
+        }
     }
 
-    val googleLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK && result.data != null) {
-            try {
-                val account = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                    .getResult(ApiException::class.java)
+    fun submitLogin() {
+        when {
+            email.isBlank() || password.isBlank() ->
+                showSnackbar(context.getString(R.string.auth_err_empty_fields))
+            !ValidationUtils.isValidEmail(email) ->
+                showSnackbar(context.getString(R.string.auth_err_invalid_email))
+            else -> {
+                HapticUtils.performClick(context)
                 isLoading = true
-                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                auth.signInWithCredential(credential).addOnCompleteListener { task ->
+                auth.signInWithEmailAndPassword(email.trim(), password).addOnCompleteListener { task ->
+                    isLoading = false
                     if (task.isSuccessful) {
-                        checkAndCreateFirestoreUser(auth, context, onSuccess = {
-                            isLoading = false
-                            Toast.makeText(context, R.string.auth_google_login_success, Toast.LENGTH_SHORT).show()
-                            onBack()
-                        }, onError = { msg ->
-                            isLoading = false
-                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                        })
+                        showSnackbar(context.getString(R.string.auth_login_success))
+                        onBack()
                     } else {
-                        isLoading = false
-                        Toast.makeText(context, R.string.auth_google_login_failed, Toast.LENGTH_SHORT).show()
+                        showSnackbar(
+                            context.getString(R.string.auth_login_failed, task.exception?.message ?: "")
+                        )
                     }
                 }
-            } catch (e: ApiException) {
-                AppLogger.e("LoginScreen", "Google sign in failed", e)
-                Toast.makeText(context, R.string.auth_google_login_failed, Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Toast.makeText(context, R.string.auth_google_login_cancelled, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -105,72 +99,67 @@ fun LoginScreen(onBack: () -> Unit, onNavigateRegister: () -> Unit) {
         return
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.action_login)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
+    AuthScreenLayout(
+        title = stringResource(R.string.action_login),
+        subtitle = stringResource(R.string.auth_welcome_back),
+        onBack = onBack,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        AuthEmailField(value = email, onValueChange = { email = it })
+        AuthPasswordField(
+            value = password,
+            onValueChange = { password = it },
+            label = stringResource(R.string.label_password),
+            modifier = Modifier.padding(top = 12.dp),
+            onImeAction = { submitLogin() }
+        )
+
+        TextButton(
+            onClick = onNavigateForgotPassword,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = stringResource(R.string.auth_forgot_password),
+                style = MaterialTheme.typography.bodySmall
             )
         }
-    ) { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("PocketMind", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(32.dp))
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            )
+        AuthPrimaryButton(
+            text = stringResource(R.string.action_login),
+            onClick = { submitLogin() },
+            modifier = Modifier.padding(top = 8.dp)
+        )
 
-            Button(
-                onClick = {
-                    if (email.isBlank() || password.isBlank()) {
-                        Toast.makeText(context, R.string.auth_err_empty_fields, Toast.LENGTH_SHORT).show()
-                        return@Button
+        AuthOrDivider(modifier = Modifier.padding(top = 16.dp, bottom = 12.dp))
+
+        AuthGoogleButton(
+            onClick = {
+                scope.launch {
+                    when (val result = GoogleSignInHelper.signIn(
+                        context,
+                        context.getString(R.string.default_web_client_id)
+                    )) {
+                        is GoogleSignInHelper.Result.Success -> finishGoogleLogin(result.idToken)
+                        GoogleSignInHelper.Result.Cancelled ->
+                            showSnackbar(context.getString(R.string.auth_google_login_cancelled))
+                        is GoogleSignInHelper.Result.Error ->
+                            showSnackbar(context.getString(R.string.auth_google_login_failed))
                     }
-                    isLoading = true
-                    auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                        isLoading = false
-                        if (task.isSuccessful) {
-                            Toast.makeText(context, R.string.auth_login_success, Toast.LENGTH_SHORT).show()
-                            onBack()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.auth_login_failed, task.exception?.message ?: ""),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-            ) { Text(stringResource(R.string.action_login)) }
-
-            OutlinedButton(
-                onClick = { googleLauncher.launch(googleSignInClient.signInIntent) },
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            ) { Text(stringResource(R.string.action_login_google)) }
-
-            TextButton(onClick = onNavigateRegister) {
-                Text(stringResource(R.string.action_register))
+                }
             }
+        )
+
+        TextButton(
+            onClick = onNavigateRegister,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.auth_no_account),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -189,7 +178,7 @@ private fun checkAndCreateFirestoreUser(
             if (document?.exists() != true) {
                 val userData = hashMapOf(
                     "uid" to user.uid,
-                    "name" to (user.displayName ?: "User"),
+                    "name" to (user.displayName ?: context.getString(R.string.auth_default_user_name)),
                     "email" to (user.email ?: ""),
                     "createdAt" to FieldValue.serverTimestamp(),
                     "ai_chat_limit" to 5,

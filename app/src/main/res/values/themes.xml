@@ -1,10 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.PocketMind" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your primary colors to green. -->
         <item name="colorPrimary">@color/green</item>
         <item name="colorSecondary">@color/yellow</item>
-        <!-- Ensure status bar icons are visible on light backgrounds -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>

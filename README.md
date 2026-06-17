@@ -1,56 +1,80 @@
 # PocketMind
 
-PocketMind là một ứng dụng quản lý tài chính cá nhân nhẹ và hiện đại trên Android. Được xây dựng theo tiêu chuẩn kiến trúc Android năm 2026, ứng dụng sử dụng giao diện Material Design 3 trực quan, sắc nét và sạch sẽ.
+PocketMind là ứng dụng quản lý tài chính cá nhân nhẹ và hiện đại trên Android. Được xây dựng theo tiêu chuẩn kiến trúc Android năm 2026 với **Kotlin** và **Jetpack Compose**, giao diện Material Design 3 trực quan, sắc nét và sạch sẽ.
 
 ## Tính năng
 
-- **Bảng điều khiển Trang chủ**: Cung cấp cái nhìn tổng quan về chi tiêu hàng tháng, so sánh sự thay đổi (+/-) so với tháng trước và trực quan hóa chi tiêu thông qua Biểu đồ tròn. Truy cập nhanh vào danh sách giao dịch gần nhất.
-- **Thêm giao dịch**: Ghi chép thu nhập hoặc chi tiêu nhanh chóng. Hỗ trợ phân loại, ghi chú, tải lên hình ảnh (hóa đơn) và tính năng nhập liệu bằng giọng nói (Voice-to-text).
-- **Báo cáo**: Phân tích tình hình tài chính theo thời gian bằng Biểu đồ cột. Lọc dữ liệu theo tháng và tìm ra các danh mục bạn chi tiêu nhiều nhất.
-- **Thông tin cá nhân**: Quản lý tài khoản, bật/tắt Chế độ tối (Dark Mode) và lưu/xuất dữ liệu cá nhân ra file CSV.
-- **Xác thực**: Đăng nhập và đăng ký an toàn bằng email tùy chỉnh hoặc Đăng nhập qua Google (Google Sign-In).
+- **Bảng điều khiển Trang chủ**: Tổng quan chi tiêu hàng tháng, biểu đồ tròn theo danh mục và danh sách giao dịch gần nhất.
+- **Thêm giao dịch**: Ghi chép thu nhập/chi tiêu thủ công hoặc chat AI (hỗ trợ gửi ảnh hóa đơn).
+- **Báo cáo**: Phân tích theo khoảng thời gian với biểu đồ cột/tròn, tổng thu/chi và danh mục hàng đầu.
+- **Thông tin cá nhân**: Quản lý tài khoản, cài đặt giao diện/ngôn ngữ/tiền tệ, xóa tài khoản.
+- **Xác thực**: Đăng nhập/đăng ký email hoặc Google Sign-In qua Firebase Auth.
+- **AI & Admin**: Cấu hình gói AI, thanh toán thủ công, bảng quản trị người dùng (role admin).
 
 ## Công nghệ sử dụng
 
-- **Ngôn ngữ**: Java
-- **Kiến trúc**: Single Activity + Multiple Fragments (Navigation Component)
-- **Giao diện (UI)**: ConstraintLayout & Material Components (M3)
-- **Biểu đồ**: MPAndroidChart
-- **Hệ thống Build**: Gradle (Kotlin DSL, `libs.versions.toml`)
+| Thành phần | Công nghệ |
+|---|---|
+| Ngôn ngữ | **Kotlin** |
+| UI | **Jetpack Compose** + Material 3 |
+| Kiến trúc | Single Activity + Navigation Compose + ViewModel |
+| State | StateFlow + `collectAsStateWithLifecycle` |
+| Backend | Firebase (Auth, Firestore, Storage, Analytics) |
+| Ảnh | Coil 3 |
+| Build | Gradle Kotlin DSL, `libs.versions.toml`, AGP 9 |
 
 ## Hướng dẫn cài đặt
 
 ### Yêu cầu hệ thống
 
-- Android Studio Koala (hoặc mới hơn)
+- Android Studio Koala trở lên
 - Android SDK 36
-- Java 11+
+- JDK 11+
+- File `google-services.json` (đặt trong `app/`, không commit)
 
-### Cài đặt và Chạy
+### Cài đặt và chạy
 
-1. Clone repository về máy:
-   ```bash
-   git clone https://github.com/yourusername/PocketMind.git
-   ```
+```bash
+git clone https://github.com/yourusername/PocketMind.git
+cd PocketMind
+```
+
+1. Thêm `app/google-services.json` từ Firebase Console.
 2. Mở dự án bằng Android Studio.
-3. Chờ Gradle đồng bộ (Sync) các file cấu hình.
-4. Chạy dự án trên máy ảo (Emulator) hoặc thiết bị thật.
+3. Gradle Sync.
+4. Chạy trên emulator hoặc thiết bị thật.
+
+```bash
+./gradlew :app:assembleDebug
+```
 
 ## Cấu trúc dự án
 
-Dự án này tuân theo các nguyên tắc kiến trúc Android tiêu chuẩn:
+```
+app/src/main/kotlin/com/tuhoang/pocketmind/
+├── MainActivity.kt              # Entry Compose
+├── PocketMindApp.kt             # Application + theme/config bootstrap
+├── data/models/                 # Firestore POJOs
+├── utils/                       # PrefsManager, CurrencyUtils, ...
+└── ui/
+    ├── theme/                   # Material 3 theme
+    ├── navigation/              # NavHost & routes
+    ├── main/                    # Bottom navigation shell
+    ├── home/                    # Dashboard
+    ├── chat/                    # Manual entry + AI chat
+    ├── report/                  # Analytics
+    ├── profile/                 # Account hub & edit
+    ├── auth/                    # Login & register
+    ├── settings/                # App settings & AI plans
+    └── admin/                   # Admin dashboard
+```
 
-- `ui/`: Chứa các Activity và Fragment, được nhóm theo từng tính năng (`auth`, `home`, v.v...).
-- `utils/`: Chứa các class tiện ích như `AppLogger`.
-- `res/layout/`: Toàn bộ file giao diện XML, sử dụng `ConstraintLayout`.
-- `res/values/`: Chứa các file cấu hình giao diện trung tâm, bao gồm danh sách màu sắc và hỗ trợ đa ngôn ngữ (Tiếng Anh EN / Tiếng Việt VI).
+## Đóng góp
 
-## Đóng góp (Contributing)
+1. Fork repository và tạo branch mới.
+2. Không commit `local.properties`, `google-services.json` hoặc file IDE.
+3. Tạo Pull Request mô tả chi tiết thay đổi.
 
-1. Fork repository và tạo một nhánh (branch) mới.
-2. Đảm bảo bạn **không** commit file `local.properties` hoặc các file rác của IDE (Tham khảo `.gitignore`).
-3. Tạo một Pull Request mô tả chi tiết các thay đổi của bạn.
+## Giấy phép
 
-## Giấy phép (License)
-
-Dự án này được cấp phép theo Giấy phép MIT - Vui lòng xem file LICENSE để biết chi tiết.
+Dự án này được cấp phép theo Giấy phép MIT — xem file LICENSE để biết chi tiết.

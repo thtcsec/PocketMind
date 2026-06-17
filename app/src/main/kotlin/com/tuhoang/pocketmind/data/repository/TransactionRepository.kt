@@ -14,6 +14,7 @@ object TransactionRepository {
         type: String,
         category: String,
         note: String,
+        receiptUrl: String? = null,
         onSuccess: () -> Unit,
         onError: (Throwable) -> Unit
     ) {
@@ -22,13 +23,14 @@ object TransactionRepository {
             onError(IllegalStateException("Not logged in"))
             return
         }
-        val data = hashMapOf(
+        val data = hashMapOf<String, Any>(
             "amount" to amount,
             "type" to type,
             "category" to category.ifBlank { "Other" },
             "note" to note,
             "timestamp" to Date()
         )
+        receiptUrl?.takeIf { it.isNotBlank() }?.let { data["receiptUrl"] = it }
         db.collection("users").document(uid).collection("expenses")
             .add(data)
             .addOnSuccessListener { onSuccess() }
@@ -44,6 +46,6 @@ object TransactionRepository {
         val type = (data["type"] as? String)?.ifBlank { "expense" } ?: "expense"
         val category = (data["category"] as? String)?.ifBlank { "Other" } ?: "Other"
         val note = (data["note"] as? String) ?: ""
-        saveTransaction(amount, type, category, note, onSuccess, onError)
+        saveTransaction(amount, type, category, note, receiptUrl = null, onSuccess, onError)
     }
 }

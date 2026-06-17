@@ -9,6 +9,7 @@ data class Transaction(
     var type: String? = null,
     var category: String? = null,
     var note: String? = null,
+    var receiptUrl: String? = null,
     @ServerTimestamp
     var timestamp: Date? = null
 )

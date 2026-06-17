@@ -26,6 +26,13 @@ import kotlinx.coroutines.withContext
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object {
+        private const val PAGE_SIZE = 50L
+        private const val MAX_STORED_MESSAGES = 200L
+        private const val TRIM_BATCH = 50L
+        private const val MAX_AI_CONTEXT_MESSAGES = 20
+    }
+
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
@@ -46,22 +53,69 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAiThinking = MutableStateFlow(false)
     val isAiThinking: StateFlow<Boolean> = _isAiThinking.asStateFlow()
 
+    private val _isLoadingOlder = MutableStateFlow(false)
+    val isLoadingOlder: StateFlow<Boolean> = _isLoadingOlder.asStateFlow()
+
+    private val _hasOlderMessages = MutableStateFlow(false)
+    val hasOlderMessages: StateFlow<Boolean> = _hasOlderMessages.asStateFlow()
+
     private var chatListener: ListenerRegistration? = null
+    private var oldestLoadedTimestamp: Long? = null
+
+    private fun chatsRef(uid: String) =
+        db.collection("users").document(uid).collection("chats")
 
     fun startListeningForMessages() {
         val uid = auth.currentUser?.uid ?: return
 
         chatListener?.remove()
-        chatListener = db.collection("users").document(uid).collection("chats")
-            .orderBy("timestamp", Query.Direction.ASCENDING)
+        oldestLoadedTimestamp = null
+        _hasOlderMessages.value = false
+
+        chatListener = chatsRef(uid)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(PAGE_SIZE)
             .addSnapshotListener { value, error ->
                 if (error != null) {
                     AppLogger.e("ChatViewModel", "Listen failed", error)
                     return@addSnapshotListener
                 }
                 if (value != null) {
-                    _messages.value = value.toObjects(ChatMessage::class.java)
+                    val list = value.toObjects(ChatMessage::class.java)
+                        .sortedBy { it.timestamp }
+                    _messages.value = list
+                    oldestLoadedTimestamp = list.firstOrNull()?.timestamp
+                    _hasOlderMessages.value = value.size().toLong() >= PAGE_SIZE
                 }
+            }
+    }
+
+    fun loadOlderMessages() {
+        val uid = auth.currentUser?.uid ?: return
+        val before = oldestLoadedTimestamp ?: return
+        if (_isLoadingOlder.value) return
+
+        _isLoadingOlder.value = true
+        chatsRef(uid)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .whereLessThan("timestamp", before)
+            .limit(PAGE_SIZE)
+            .get()
+            .addOnSuccessListener { snapshots ->
+                val older = snapshots.toObjects(ChatMessage::class.java)
+                if (older.isEmpty()) {
+                    _hasOlderMessages.value = false
+                } else {
+                    val merged = (older + _messages.value).sortedBy { it.timestamp }
+                    _messages.value = merged
+                    oldestLoadedTimestamp = merged.firstOrNull()?.timestamp
+                    _hasOlderMessages.value = snapshots.size().toLong() >= PAGE_SIZE
+                }
+                _isLoadingOlder.value = false
+            }
+            .addOnFailureListener { e ->
+                AppLogger.e("ChatViewModel", "Load older failed", e)
+                _isLoadingOlder.value = false
             }
     }
 
@@ -73,11 +127,32 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun sendMessage(text: String) {
         val uid = auth.currentUser?.uid ?: return
         val userMsg = ChatMessage(text, true, System.currentTimeMillis())
-        db.collection("users").document(uid).collection("chats").add(userMsg)
-            .addOnSuccessListener { requestAiResponse(text) }
+        chatsRef(uid).add(userMsg)
+            .addOnSuccessListener {
+                trimOldMessagesIfNeeded(uid)
+                requestAiResponse(text)
+            }
             .addOnFailureListener { e ->
                 _errorEvents.value = app.getString(R.string.chat_send_failed, e.message ?: "")
             }
+    }
+
+    private fun trimOldMessagesIfNeeded(uid: String) {
+        chatsRef(uid).get().addOnSuccessListener { snapshots ->
+            val count = snapshots.size()
+            if (count <= MAX_STORED_MESSAGES) return@addOnSuccessListener
+
+            val toDelete = snapshots.documents
+                .sortedBy { it.getLong("timestamp") ?: 0L }
+                .take((count - MAX_STORED_MESSAGES + TRIM_BATCH).toInt().coerceAtLeast(0))
+            if (toDelete.isEmpty()) return@addOnSuccessListener
+
+            val batch = db.batch()
+            toDelete.forEach { batch.delete(it.reference) }
+            batch.commit().addOnSuccessListener {
+                AppLogger.d("ChatViewModel", "Trimmed ${toDelete.size} old chat messages")
+            }
+        }
     }
 
     private fun requestAiResponse(userText: String) {
@@ -88,9 +163,17 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
+                val contextMessages = _messages.value
+                    .takeLast(MAX_AI_CONTEXT_MESSAGES)
+                    .joinToString("\n") { msg ->
+                        val role = if (msg.isUser) "user" else "assistant"
+                        "$role: ${msg.content}"
+                    }
+                val payload = if (contextMessages.isBlank()) userText else "$contextMessages\nuser: $userText"
+
                 val result = withContext(Dispatchers.IO) {
                     val idToken = Tasks.await(user.getIdToken(false)).token.orEmpty()
-                    WorkerApiClient.postChat(workerUrl, idToken, uid, userText)
+                    WorkerApiClient.postChat(workerUrl, idToken, uid, payload)
                 }
                 val replyText = when {
                     result.message != null -> result.message
@@ -100,7 +183,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     else -> app.getString(R.string.chat_ai_error)
                 }
                 val botMsg = ChatMessage(replyText, false, System.currentTimeMillis())
-                db.collection("users").document(uid).collection("chats").add(botMsg)
+                chatsRef(uid).add(botMsg).addOnSuccessListener { trimOldMessagesIfNeeded(uid) }
 
                 result.extractedData?.let { data ->
                     TransactionRepository.saveFromAiData(
@@ -116,7 +199,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 AppLogger.e("ChatViewModel", "AI request failed", e)
                 val fallback = ChatMessage(app.getString(R.string.chat_ai_response), false, System.currentTimeMillis())
-                db.collection("users").document(uid).collection("chats").add(fallback)
+                chatsRef(uid).add(fallback)
                 _errorEvents.value = app.getString(R.string.chat_ai_error)
             } finally {
                 _isAiThinking.value = false
@@ -128,7 +211,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         amountRaw: String,
         type: String,
         category: String,
-        note: String
+        note: String,
+        receiptUri: Uri? = null
     ) {
         val amount = ValidationUtils.parseAmount(amountRaw)
         if (amount == null) {
@@ -140,20 +224,52 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         _isSavingManual.value = true
-        TransactionRepository.saveTransaction(
-            amount = amount,
-            type = type,
-            category = category.trim(),
-            note = note.trim(),
-            onSuccess = {
-                _isSavingManual.value = false
-                _infoEvents.value = app.getString(R.string.add_saved_success)
-            },
-            onError = { e ->
+
+        fun persist(receiptUrl: String?) {
+            TransactionRepository.saveTransaction(
+                amount = amount,
+                type = type,
+                category = category.trim(),
+                note = note.trim(),
+                receiptUrl = receiptUrl,
+                onSuccess = {
+                    _isSavingManual.value = false
+                    _infoEvents.value = app.getString(R.string.add_saved_success)
+                },
+                onError = { e ->
+                    _isSavingManual.value = false
+                    _errorEvents.value = app.getString(R.string.add_save_failed, e.message ?: "")
+                }
+            )
+        }
+
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            _isSavingManual.value = false
+            _errorEvents.value = app.getString(R.string.add_save_failed, "Not logged in")
+            return
+        }
+
+        if (receiptUri == null) {
+            persist(null)
+            return
+        }
+
+        val ts = System.currentTimeMillis()
+        val fileRef = storage.reference.child("receipts").child(uid).child("$ts.jpg")
+        fileRef.putFile(receiptUri)
+            .addOnSuccessListener {
+                fileRef.downloadUrl
+                    .addOnSuccessListener { url -> persist(url.toString()) }
+                    .addOnFailureListener { e ->
+                        _isSavingManual.value = false
+                        _errorEvents.value = app.getString(R.string.add_save_failed, e.message ?: "")
+                    }
+            }
+            .addOnFailureListener { e ->
                 _isSavingManual.value = false
                 _errorEvents.value = app.getString(R.string.add_save_failed, e.message ?: "")
             }
-        )
     }
 
     fun uploadImageAndSend(uri: Uri) {
@@ -167,8 +283,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             .addOnSuccessListener {
                 fileRef.downloadUrl.addOnSuccessListener { downloadUrl ->
                     val imgMsg = ChatMessage("[Image]", true, ts, downloadUrl.toString())
-                    db.collection("users").document(uid).collection("chats").add(imgMsg)
-                        .addOnSuccessListener { requestAiResponse("[Image uploaded]") }
+                    chatsRef(uid).add(imgMsg)
+                        .addOnSuccessListener {
+                            trimOldMessagesIfNeeded(uid)
+                            requestAiResponse("[Image uploaded]")
+                        }
                 }
             }
             .addOnFailureListener { e ->
@@ -176,14 +295,18 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-    fun clearChatHistory() {
+    fun clearChatHistory(onComplete: () -> Unit = {}) {
         val uid = auth.currentUser?.uid ?: return
-        db.collection("users").document(uid).collection("chats").get()
+        chatsRef(uid).get()
             .addOnSuccessListener { snapshots ->
                 val batch = db.batch()
                 snapshots.forEach { batch.delete(it.reference) }
                 batch.commit().addOnSuccessListener {
+                    _messages.value = emptyList()
+                    _hasOlderMessages.value = false
+                    oldestLoadedTimestamp = null
                     _infoEvents.value = app.getString(R.string.chat_cleared)
+                    onComplete()
                 }
             }
     }

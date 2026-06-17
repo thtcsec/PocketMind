@@ -12,12 +12,16 @@ class PocketMindApp : Application() {
         const val THEME_SYSTEM = 0
         const val THEME_LIGHT = 1
         const val THEME_DARK = 2
+        const val DEFAULT_WORKER_URL = "https://pocketmind.tht-csec2005.workers.dev"
     }
 
     override fun onCreate() {
         super.onCreate()
         PrefsManager.init(this)
         PrefsManager.getInstance().clearLegacyApiSecrets()
+        if (PrefsManager.getInstance().getWorkerUrl().isBlank()) {
+            PrefsManager.getInstance().setWorkerUrl(DEFAULT_WORKER_URL)
+        }
         applyPersistedTheme()
         fetchGlobalConfig()
     }

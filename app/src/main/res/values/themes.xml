@@ -7,4 +7,10 @@
     </style>
 
     <style name="Theme.PocketMind" parent="Base.Theme.PocketMind" />
+
+    <style name="Theme.PocketMind.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/green</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.PocketMind</item>
+    </style>
 </resources>

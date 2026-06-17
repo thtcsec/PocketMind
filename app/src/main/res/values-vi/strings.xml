@@ -9,6 +9,20 @@
     <string name="action_login_google">Đăng nhập bằng Google</string>
     <string name="action_register">Đăng ký</string>
     <string name="action_logout">Đăng xuất</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_ok">OK</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_back">Quay lại</string>
+
+    <!-- Labels -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Mật khẩu</string>
+    <string name="label_name">Tên</string>
+    <string name="label_confirm_password">Xác nhận mật khẩu</string>
+    <string name="label_amount">Số tiền</string>
+    <string name="label_category">Danh mục</string>
+    <string name="label_note">Ghi chú</string>
+    <string name="category_other">Khác</string>
 
     <!-- Settings -->
     <string name="title_settings">Cài đặt</string>
@@ -17,68 +31,57 @@
     <string name="theme_system">Theo hệ thống</string>
     <string name="theme_light">Sáng</string>
     <string name="theme_dark">Tối</string>
-    <string name="settings_language">Ngôn ngữ: Tiếng Việt</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_select_language">Chọn ngôn ngữ</string>
     <string name="settings_data_storage">Dữ liệu &amp; Lưu trữ</string>
     <string name="settings_currency">Tiền tệ</string>
     <string name="settings_clear_cache">Xoá Cache đệm</string>
     <string name="settings_app_info">Thông tin Ứng dụng</string>
     <string name="settings_notifications">Thông báo</string>
     <string name="settings_developer">Nhà phát triển: Trịnh Hoàng Tú</string>
+    <string name="settings_version">Phiên bản: %1$s</string>
+    <string name="settings_unknown_version">Không rõ</string>
+    <string name="settings_cache_cleared">Đã xoá cache.</string>
+    <string name="settings_permissions_storage">Quyền Bộ nhớ &amp; Thư viện ảnh</string>
+    <string name="settings_permissions_mic">Quyền truy cập Micrô</string>
+    <string name="settings_permissions_camera">Quyền truy cập Camera</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="you_must_login_to_configure">Bạn cần đăng nhập để thiết lập AI.</string>
+    <string name="settings_ai_section">Thông minh nhân tạo</string>
+    <string name="settings_ai_config">Cấu hình AI</string>
 
-    <!-- Admin Dashboard -->
+    <!-- Admin -->
     <string name="admin_dashboard_title">Bảng điều khiển Quản trị</string>
     <string name="admin_dashboard_desc">Quản lý Người dùng và Gói AI (Chỉ Quản trị viên)</string>
     <string name="admin_tab_users">Người dùng</string>
     <string name="admin_tab_plans">Gói AI</string>
     <string name="admin_err_no_access">Bạn không có quyền truy cập quản trị viên.</string>
+    <string name="admin_edit_user_title">Sửa người dùng: %1$s</string>
+    <string name="admin_role_label">Vai trò (user/admin)</string>
+    <string name="admin_limit_label">Giới hạn chat AI</string>
+    <string name="admin_user_updated">Đã cập nhật người dùng</string>
+    <string name="admin_global_config_title">Cấu hình hệ thống</string>
+    <string name="admin_global_config_desc">Cập nhật URL Cloudflare Worker cho TOÀN BỘ người dùng.</string>
+    <string name="admin_worker_url_label">URL Worker</string>
+    <string name="admin_worker_updated">Đã cập nhật URL Worker toàn cục!</string>
+    <string name="admin_save_globally">Lưu toàn cục</string>
+    <string name="admin_unknown">Không rõ</string>
+    <string name="admin_no_email">Không có email</string>
+    <string name="admin_user_role_limit">Vai trò: %1$s | Giới hạn: %2$s</string>
+    <string name="admin_edit">Sửa</string>
+    <string name="admin_unknown_plan">Gói không rõ</string>
+    <string name="admin_plan_active">Đang hoạt động</string>
+    <string name="admin_plan_inactive">Không hoạt động</string>
+    <string name="admin_edit_plan_toast">Sửa gói: %1$s</string>
+    <string name="admin_config_worker">Cấu hình Worker</string>
 
-    <!-- Dialog & Generic Actions -->
-    <string name="action_cancel">Hủy</string>
-
-    <!-- Profile -->
-    <string name="profile_logout_title">Đăng xuất</string>
-    <string name="profile_logout_msg">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?</string>
-
-    <!-- Auth -->
-    <string name="auth_login_success">Đăng nhập thành công!</string>
-    <string name="auth_login_failed">Đăng nhập thất bại: %1$s</string>
-    <string name="auth_google_login_success">Đăng nhập Google thành công!</string>
-    <string name="auth_google_login_failed">Đăng nhập Google thất bại.</string>
-    <string name="auth_google_login_cancelled">Đã hủy đăng nhập Google.</string>
-    <string name="auth_register_success">Đăng ký thành công!</string>
-    <string name="auth_register_failed">Đăng ký thất bại: %1$s</string>
-    <string name="auth_err_empty_fields">Vui lòng nhập đầy đủ thông tin.</string>
-    <string name="auth_err_password_mismatch">Mật khẩu xác nhận không khớp.</string>
-    <string name="auth_err_password_length">Mật khẩu phải từ 6 kí tự.</string>
-    <string name="action_logging_in">Đang đăng nhập…</string>
-    <string name="action_registering">Đang đăng ký…</string>
-    <string name="auth_err_init_failed">Lỗi khởi tạo dữ liệu: %1$s</string>
-
-    <!-- Add Fragment -->
-    <string name="add_voice_recording">Bạn vừa nói: Đang khởi động AI Voice…</string>
-    <string name="error_mic_permission">Cần cấp quyền Microphone để dùng tính năng này.</string>
-    <string name="add_camera_opening">Mở thư viện ảnh/camera để phân tích với AI…</string>
-    <string name="error_camera_permission">Cần cấp quyền Camera để dùng tính năng này.</string>
-    <string name="add_saving_manual">Lưu giao dịch Manual…</string>
-
-    <!-- Payment Dialog -->
-    <string name="payment_title">Thanh toán gói AI</string>
-    <string name="payment_desc">Vui lòng chuyển khoản đến tài khoản dưới đây với ĐÚNG nội dung chuyển khoản để hệ thống duyệt tự động.</string>
-    <string name="payment_bank_name">Ngân hàng: MB Bank</string>
-    <string name="payment_bank_account">STK: 0123456789</string>
-    <string name="payment_bank_owner">Chủ TK: TRINH HOANG TU</string>
-    <string name="payment_code_label">NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC):</string>
-    <string name="action_transferred">Tôi đã chuyển…</string>
-
-    <!-- AI Settings Extended -->
-    <string name="settings_ai_section">Thông minh nhân tạo</string>
-    <string name="settings_ai_config">Cấu hình AI</string>
+    <!-- AI Settings -->
     <string name="ai_config_api_key">Dùng API Key Cá Nhân</string>
     <string name="ai_config_pocketmind">Gói PocketMind AI</string>
     <string name="ai_plan_free">GÓI MIỄN PHÍ (5 Chat/Ngày)</string>
     <string name="ai_plan_pro">GÓI PRO (Không giới hạn chữ)</string>
     <string name="ai_plan_max">GÓI MAX (Không giới hạn Thu Âm/Ảnh)</string>
-
     <string name="ai_config_subtitle">Chọn phương thức AI. Bạn có thể sử dụng API Key cá nhân, hoặc đăng ký các gói của PocketMind.</string>
     <string name="ai_mode_plans">Gói PocketMind</string>
     <string name="ai_mode_apikey">API Key Của Tôi</string>
@@ -100,25 +103,30 @@
     <string name="ai_msg_payment_pending">Đã gửi yêu cầu đối soát! Đang đợi duyệt…</string>
     <string name="ai_err_connection">Lỗi kết nối. Vui lòng thử lại sau.</string>
     <string name="ai_toast_payment_title">Thanh toán %1$s</string>
+    <string name="ai_feature_text_limit">• %1$s tin nhắn văn bản mỗi chu kỳ</string>
+    <string name="ai_feature_unlim_text">• Chat văn bản không giới hạn</string>
+    <string name="ai_feature_priority">• Hàng đợi xử lý ưu tiên</string>
+    <string name="ai_feature_voice">• Hỗ trợ tương tác giọng nói</string>
+    <string name="ai_feature_image">• Phân tích ảnh &amp; hóa đơn nâng cao</string>
+    <string name="ai_feature_premium_models">• Mô hình cao cấp: %1$s</string>
+    <string name="ai_feature_generic">• %1$s: %2$s</string>
 
-    <!-- Home Fragment -->
-    <string name="home_total_expenses">Tổng Chi Tiêu</string>
-    <string name="home_comparison_mock">+5% so với tháng trước</string>
-    <string name="home_recent_transactions">Giao dịch gần đây</string>
+    <!-- Payment -->
+    <string name="payment_title">Thanh toán gói AI</string>
+    <string name="payment_desc">Vui lòng chuyển khoản đến tài khoản dưới đây với ĐÚNG nội dung chuyển khoản để hệ thống duyệt tự động.</string>
+    <string name="payment_bank_name">Ngân hàng: MB Bank</string>
+    <string name="payment_bank_account">STK: 0123456789</string>
+    <string name="payment_bank_owner">Chủ TK: TRINH HOANG TU</string>
+    <string name="payment_code_label">NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC):</string>
+    <string name="action_transferred">Tôi đã chuyển</string>
 
-    <!-- Profile Fragment -->
+    <!-- Profile -->
+    <string name="profile_logout_title">Đăng xuất</string>
+    <string name="profile_logout_msg">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?</string>
+    <string name="profile_edit_title">Sửa hồ sơ</string>
     <string name="guest">Khách</string>
     <string name="please_login_to_sync">Vui lòng đăng nhập để đồng bộ</string>
-    <!-- Settings Permissions -->
-    <string name="settings_permissions_storage">Quyền Bộ nhớ &amp; Thư viện ảnh</string>
-    <string name="settings_permissions_mic">Quyền truy cập Micrô</string>
-    <string name="settings_permissions_camera">Quyền truy cập Camera</string>
-    <string name="vietnamese">Tiếng Việt</string>
-    <string name="english">Tiếng Anh</string>
-    <string name="you_must_login_to_configure">Bạn cần đăng nhập để thiết lập AI.</string>
-
-
-    <!-- Profile Delete Account -->
+    <string name="get_started">Bắt đầu</string>
     <string name="profile_delete_account">Xóa tài khoản</string>
     <string name="profile_delete_title">Cảnh báo: Xóa tài khoản</string>
     <string name="profile_delete_message">Hành động này là VĨNH VIỄN. Toàn bộ dữ liệu chi tiêu và lịch sử trò chuyện AI của bạn sẽ bị xóa hoàn toàn.\n\nGõ \"delete\" xuống dưới và tích chọn để xác nhận.</string>
@@ -126,9 +134,155 @@
     <string name="profile_delete_keyword">delete</string>
     <string name="profile_delete_confirm">Tôi hiểu rằng dữ liệu của tôi sẽ bị mất</string>
     <string name="profile_delete_invalid">Bạn phải gõ \"delete\" và tích chọn xác nhận.</string>
+    <string name="profile_processing">Đang xử lý…</string>
+    <string name="profile_name_required">Tên không được để trống</string>
+    <string name="profile_save_success">Lưu thành công!</string>
+    <string name="profile_save_error_db">Lỗi cập nhật CSDL</string>
+    <string name="profile_save_error_auth">Lỗi cập nhật Profile</string>
+    <string name="profile_delete_success">Tài khoản đã chuyển sang trạng thái chờ xóa. Đã đăng xuất.</string>
+    <string name="profile_delete_error">Lỗi xử lý xóa tài khoản</string>
+    <string name="cd_avatar">Ảnh đại diện</string>
 
+    <!-- Auth -->
+    <string name="auth_create_account">Tạo tài khoản</string>
+    <string name="auth_welcome_back">Chào mừng trở lại! Đăng nhập để tiếp tục.</string>
+    <string name="auth_register_subtitle">Tạo tài khoản chỉ với vài bước.</string>
+    <string name="auth_no_account">Chưa có tài khoản? Đăng ký</string>
+    <string name="auth_have_account">Đã có tài khoản? Đăng nhập</string>
+    <string name="auth_or_continue_with">hoặc tiếp tục với</string>
+    <string name="cd_show_password">Hiện mật khẩu</string>
+    <string name="cd_hide_password">Ẩn mật khẩu</string>
+    <string name="exit_press_back_again">Nhấn back thêm lần nữa để thoát</string>
+    <string name="auth_login_success">Đăng nhập thành công!</string>
+    <string name="auth_login_failed">Đăng nhập thất bại: %1$s</string>
+    <string name="auth_google_login_success">Đăng nhập Google thành công!</string>
+    <string name="auth_google_login_failed">Đăng nhập Google thất bại.</string>
+    <string name="auth_google_login_cancelled">Đã hủy đăng nhập Google.</string>
+    <string name="auth_register_success">Đăng ký thành công!</string>
+    <string name="auth_register_failed">Đăng ký thất bại: %1$s</string>
+    <string name="auth_err_empty_fields">Vui lòng nhập đầy đủ thông tin.</string>
+    <string name="auth_err_password_mismatch">Mật khẩu xác nhận không khớp.</string>
+    <string name="auth_err_password_length">Mật khẩu phải từ 6 kí tự.</string>
+    <string name="action_logging_in">Đang đăng nhập…</string>
+    <string name="action_registering">Đang đăng ký…</string>
+    <string name="auth_err_init_failed">Lỗi khởi tạo dữ liệu: %1$s</string>
+    <string name="auth_default_user_name">Người dùng</string>
 
+    <!-- Home -->
+    <string name="home_total_expenses">Tổng Chi Tiêu</string>
+    <string name="home_this_month">Tháng này</string>
+    <string name="home_expenses_chart_center">Chi tiêu\nTháng này</string>
+    <string name="home_comparison_mock">+5% so với tháng trước</string>
+    <string name="home_recent_transactions">Giao dịch gần đây</string>
+    <string name="home_no_transactions">Chưa có giao dịch nào.</string>
+    <string name="section_monthly_overview">Tổng quan tháng</string>
+    <string name="section_spending_by_category">Chi tiêu theo danh mục</string>
+    <string name="section_summary">Tóm tắt</string>
+    <string name="section_charts">Biểu đồ</string>
+    <string name="section_manual_entry">Nhập thủ công</string>
+    <string name="section_account_actions">Tài khoản</string>
+
+    <!-- Report -->
+    <string name="report_income">Thu nhập</string>
+    <string name="report_expense">Chi tiêu</string>
+    <string name="report_top_category">Danh mục hàng đầu: %1$s (%2$.0f đ)</string>
+    <string name="report_no_expenses">Không có chi tiêu trong khoảng thời gian này</string>
+    <string name="report_chart_bar">Cột</string>
+    <string name="report_chart_pie">Tròn</string>
+    <string name="report_expenses_center">Chi tiêu</string>
+    <string name="report_loading_suffix"> (Đang tải…)</string>
+    <string name="report_select_date_range">Chọn khoảng thời gian</string>
+
+    <!-- Chat / Add -->
+    <string name="chat_mode_manual">Thủ công</string>
+    <string name="chat_mode_ai">Chat AI</string>
+    <string name="chat_type_expense">Chi tiêu</string>
+    <string name="chat_type_income">Thu nhập</string>
+    <string name="chat_input_placeholder">Nhập tin nhắn…</string>
+    <string name="chat_uploading">Đang tải ảnh lên…</string>
+    <string name="chat_cleared">Đã xóa lịch sử chat trên cloud.</string>
+    <string name="chat_send_failed">Gửi tin nhắn thất bại: %1$s</string>
+    <string name="chat_upload_failed">Tải ảnh thất bại: %1$s</string>
+    <string name="chat_ai_response">Tôi sẽ tự động phân loại giao dịch gần nhất của bạn.</string>
+    <string name="add_voice_recording">Đang ghi âm AI Voice…</string>
+    <string name="error_mic_permission">Cần cấp quyền Microphone để dùng tính năng này.</string>
+    <string name="error_camera_permission">Cần cấp quyền Camera để dùng tính năng này.</string>
+    <string name="error_storage_disabled">Quyền lưu trữ đã bị tắt trong Cài đặt ứng dụng</string>
+    <string name="error_mic_disabled">Microphone đã bị tắt trong Cài đặt ứng dụng</string>
+    <string name="add_saving_manual">Đang lưu giao dịch thủ công…</string>
+    <string name="cd_clear_chat">Xóa chat</string>
+    <string name="cd_upload_image">Tải ảnh lên</string>
+    <string name="cd_voice_input">Nhập giọng nói</string>
+    <string name="cd_send_message">Gửi tin nhắn</string>
+    <string name="cd_chat_image">Ảnh chat</string>
+
+    <!-- Charts -->
+    <string name="chart_no_data">Không có dữ liệu</string>
+
+    <!-- Currency -->
     <string name="currency">Mệnh giá</string>
-    <string name="get_started">Bắt đầu</string>
+    <string name="price_per_month_usd">$%1$s / Tháng</string>
+    <string name="price_per_month_aud">$%1$s AUD / Tháng</string>
+    <string name="price_per_month_jpy">¥%1$s / Tháng</string>
+    <string name="price_per_month_vnd">%1$s đ / Tháng</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_page1_title">Theo dõi chi tiêu dễ dàng</string>
+    <string name="onboarding_page1_desc">Ghi thủ công hoặc để AI phân loại giao dịch cho bạn.</string>
+    <string name="onboarding_page2_title">Báo cáo thông minh</string>
+    <string name="onboarding_page2_desc">Xem biểu đồ, lọc giao dịch và xuất CSV bất cứ lúc nào.</string>
+    <string name="onboarding_page3_title">An toàn &amp; đồng bộ</string>
+    <string name="onboarding_page3_desc">Đăng nhập Google hoặc email. Dữ liệu lưu trên Firebase.</string>
+    <string name="onboarding_next">Tiếp</string>
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_get_started">Bắt đầu</string>
+
+    <!-- Budget -->
+    <string name="budget_label">Ngân sách tháng: %1$s</string>
+    <string name="budget_warning">Bạn đã dùng 80% ngân sách tháng này.</string>
+    <string name="budget_exceeded">Đã vượt ngân sách tháng!</string>
+    <string name="settings_monthly_budget">Ngân sách tháng</string>
+    <string name="settings_budget_amount">Số tiền (0 = tắt)</string>
+    <string name="settings_budget_saved">Đã lưu ngân sách</string>
+
+    <!-- Search / filter / export -->
+    <string name="search_transactions">Tìm giao dịch</string>
+    <string name="filter_category">Danh mục</string>
+    <string name="filter_all_categories">Tất cả danh mục</string>
+    <string name="export_csv">Xuất CSV</string>
+    <string name="export_share_title">Chia sẻ báo cáo</string>
+    <string name="export_no_data">Không có dữ liệu để xuất</string>
+    <string name="report_transaction_list">Danh sách giao dịch</string>
+
+    <!-- Auth extras -->
+    <string name="auth_forgot_password">Quên mật khẩu?</string>
+    <string name="auth_forgot_password_desc">Nhập email để nhận liên kết đặt lại mật khẩu.</string>
+    <string name="auth_send_reset_link">Gửi liên kết</string>
+    <string name="auth_sending_reset">Đang gửi…</string>
+    <string name="auth_reset_email_sent">Đã gửi email đặt lại mật khẩu.</string>
+    <string name="auth_reset_failed">Gửi thất bại: %1$s</string>
+    <string name="auth_err_invalid_email">Vui lòng nhập email hợp lệ.</string>
+
+    <!-- Settings extras -->
+    <string name="settings_security">Bảo mật &amp; cá nhân hóa</string>
+    <string name="settings_biometric">Mở khóa bằng sinh trắc học</string>
+    <string name="settings_dynamic_color">Màu động (Material You)</string>
+    <string name="settings_haptic">Rung phản hồi</string>
+    <string name="settings_permissions">Quyền ứng dụng</string>
+    <string name="biometric_title">Mở khóa PocketMind</string>
+    <string name="biometric_subtitle">Xác nhận danh tính để tiếp tục</string>
+    <string name="biometric_unlock_prompt">Đang chờ xác thực sinh trắc học…</string>
+
+    <!-- Chat extras -->
+    <string name="chat_ai_thinking">AI đang xử lý…</string>
+    <string name="chat_ai_saved">Đã lưu giao dịch từ phản hồi AI.</string>
+    <string name="chat_ai_error">Dịch vụ AI không khả dụng. Thử lại sau.</string>
+    <string name="chat_transaction_saved">Đã lưu chi tiêu từ chat.</string>
+    <string name="add_saved_success">Đã lưu giao dịch!</string>
+    <string name="add_save_failed">Lưu thất bại: %1$s</string>
+    <string name="err_invalid_amount">Vui lòng nhập số tiền hợp lệ.</string>
+    <string name="err_category_required">Danh mục là bắt buộc.</string>
+
+    <!-- Payment -->
+    <string name="payment_sepay_qr_hint">URL QR Sepay (mở trình duyệt để thanh toán):</string>
 </resources>

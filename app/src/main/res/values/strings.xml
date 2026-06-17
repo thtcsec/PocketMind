@@ -8,6 +8,20 @@
     <string name="action_login_google">Sign in with Google</string>
     <string name="action_register">Register</string>
     <string name="action_logout">Logout</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+    <string name="action_save">Save</string>
+    <string name="action_back">Back</string>
+
+    <!-- Labels -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_name">Name</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="label_amount">Amount</string>
+    <string name="label_category">Category</string>
+    <string name="label_note">Note</string>
+    <string name="category_other">Other</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
@@ -16,69 +30,57 @@
     <string name="theme_system">System default</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="settings_language">Language: English</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_select_language">Select Language</string>
     <string name="settings_data_storage">Data &amp; Storage</string>
     <string name="settings_currency">Currency</string>
     <string name="settings_clear_cache">Clear Cache</string>
     <string name="settings_app_info">About</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_developer">Developer: Trinh Hoang Tu</string>
+    <string name="settings_version">Version: %1$s</string>
+    <string name="settings_unknown_version">Unknown</string>
+    <string name="settings_cache_cleared">Cache cleared.</string>
+    <string name="settings_permissions_storage">Storage permission</string>
+    <string name="settings_permissions_mic">Microphone permission</string>
+    <string name="settings_permissions_camera">Camera permission</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="english">English</string>
+    <string name="you_must_login_to_configure">You must login to configure AI.</string>
+    <string name="settings_ai_section">Artificial Intelligence</string>
+    <string name="settings_ai_config">AI Configuration</string>
 
-    <!-- Admin Dashboard -->
+    <!-- Admin -->
     <string name="admin_dashboard_title">Admin Dashboard</string>
     <string name="admin_dashboard_desc">Manage Users and AI Plans (Admin Only)</string>
     <string name="admin_tab_users">Users</string>
     <string name="admin_tab_plans">AI Plans</string>
     <string name="admin_err_no_access">You do not have administrative privileges.</string>
+    <string name="admin_edit_user_title">Edit User: %1$s</string>
+    <string name="admin_role_label">Role (user/admin)</string>
+    <string name="admin_limit_label">AI Chat Limit</string>
+    <string name="admin_user_updated">User updated</string>
+    <string name="admin_global_config_title">System Global Config</string>
+    <string name="admin_global_config_desc">Update the Cloudflare Worker URL globally for ALL users.</string>
+    <string name="admin_worker_url_label">Worker URL</string>
+    <string name="admin_worker_updated">Global Worker URL updated!</string>
+    <string name="admin_save_globally">Save Globally</string>
+    <string name="admin_unknown">Unknown</string>
+    <string name="admin_no_email">No Email</string>
+    <string name="admin_user_role_limit">Role: %1$s | Limit: %2$s</string>
+    <string name="admin_edit">Edit</string>
+    <string name="admin_unknown_plan">Unknown Plan</string>
+    <string name="admin_plan_active">Active</string>
+    <string name="admin_plan_inactive">Inactive</string>
+    <string name="admin_edit_plan_toast">Edit Plan: %1$s</string>
+    <string name="admin_config_worker">Config Worker</string>
 
     <!-- AI Settings -->
-    <string name="settings_ai_section">Artificial Intelligence</string>
-    <string name="settings_ai_config">AI Configuration</string>
     <string name="ai_config_api_key">Use Personal API Key</string>
     <string name="ai_config_pocketmind">PocketMind AI Plans</string>
     <string name="ai_plan_free">FREE PLAN (5 Chats/Day)</string>
     <string name="ai_plan_pro">PRO PLAN (Unlimited Text)</string>
     <string name="ai_plan_max">MAX PLAN (Unlimited Audio/Image)</string>
-
-    <!-- Dialog & Generic Actions -->
-    <string name="action_cancel">Cancel</string>
-
-    <!-- Profile -->
-    <string name="profile_logout_title">Logout</string>
-    <string name="profile_logout_msg">Are you sure you want to sign out?</string>
-
-    <!-- Auth -->
-    <string name="auth_login_success">Login successful!</string>
-    <string name="auth_login_failed">Login failed: %1$s</string>
-    <string name="auth_google_login_success">Google login successful!</string>
-    <string name="auth_google_login_failed">Google login failed.</string>
-    <string name="auth_google_login_cancelled">Google login cancelled.</string>
-    <string name="auth_register_success">Registration successful!</string>
-    <string name="auth_register_failed">Registration failed: %1$s</string>
-    <string name="auth_err_empty_fields">Please fill in all fields.</string>
-    <string name="auth_err_password_mismatch">Passwords do not match.</string>
-    <string name="auth_err_password_length">Password must be at least 6 characters.</string>
-    <string name="action_logging_in">Logging in…</string>
-    <string name="action_registering">Creating account…</string>
-    <string name="auth_err_init_failed">Data initialization failed: %1$s</string>
-
-    <!-- Add Fragment -->
-    <string name="add_voice_recording">Recording AI Voice…</string>
-    <string name="error_mic_permission">Microphone permission required.</string>
-    <string name="add_camera_opening">Opening camera for AI analysis…</string>
-    <string name="error_camera_permission">Camera permission required.</string>
-    <string name="add_saving_manual">Saving manual transaction…</string>
-
-    <!-- Payment Dialog -->
-    <string name="payment_title">AI Plan Payment</string>
-    <string name="payment_desc">Please transfer to the account below with the EXACT content for automated approval.</string>
-    <string name="payment_bank_name">Bank: MB Bank</string>
-    <string name="payment_bank_account">Account No: 0123456789</string>
-    <string name="payment_bank_owner">Owner: TRINH HOANG TU</string>
-    <string name="payment_code_label">TRANSFER CONTENT (REQUIRED):</string>
-    <string name="action_transferred">I have transferred</string>
-
-    <!-- AI Settings Extended -->
     <string name="ai_config_subtitle">Choose your preferred AI Provider method. You can use your own API keys for full control, or subscribe to PocketMind AI and let us handle it.</string>
     <string name="ai_mode_plans">PocketMind Plans</string>
     <string name="ai_mode_apikey">My API Key</string>
@@ -100,24 +102,30 @@
     <string name="ai_msg_payment_pending">Verification request sent! Awaiting approval…</string>
     <string name="ai_err_connection">Connection error. Please try again later.</string>
     <string name="ai_toast_payment_title">Pay %1$s</string>
+    <string name="ai_feature_text_limit">• %1$s Text Chats per cycle</string>
+    <string name="ai_feature_unlim_text">• Unlimited Text Chats</string>
+    <string name="ai_feature_priority">• Priority Processing Queue</string>
+    <string name="ai_feature_voice">• Voice Interaction Included</string>
+    <string name="ai_feature_image">• Advanced Image &amp; Receipt Parsing</string>
+    <string name="ai_feature_premium_models">• Premium Models: %1$s</string>
+    <string name="ai_feature_generic">• %1$s: %2$s</string>
 
-    <!-- Home Fragment -->
-    <string name="home_total_expenses">Total Expenses</string>
-    <string name="home_comparison_mock">+5% from last month</string>
-    <string name="home_recent_transactions">Recent Transactions</string>
+    <!-- Payment -->
+    <string name="payment_title">AI Plan Payment</string>
+    <string name="payment_desc">Please transfer to the account below with the EXACT content for automated approval.</string>
+    <string name="payment_bank_name">Bank: MB Bank</string>
+    <string name="payment_bank_account">Account No: 0123456789</string>
+    <string name="payment_bank_owner">Owner: TRINH HOANG TU</string>
+    <string name="payment_code_label">TRANSFER CONTENT (REQUIRED):</string>
+    <string name="action_transferred">I have transferred</string>
 
-    <!-- Profile Fragment -->
+    <!-- Profile -->
+    <string name="profile_logout_title">Logout</string>
+    <string name="profile_logout_msg">Are you sure you want to sign out?</string>
+    <string name="profile_edit_title">Edit Profile</string>
     <string name="guest">Guest</string>
     <string name="please_login_to_sync">Please login to sync data</string>
-    <!-- Settings Permissions -->
-    <string name="settings_permissions_storage">Storage permission</string>
-    <string name="settings_permissions_mic">Microphone permission</string>
-    <string name="settings_permissions_camera">Camera permission</string>
-    <string name="vietnamese">Vietnamese</string>
-    <string name="english">English</string>
-    <string name="you_must_login_to_configure">You must login to configure AI.</string>
-
-    <!-- Profile Delete Account -->
+    <string name="get_started">Get started</string>
     <string name="profile_delete_account">Delete Account</string>
     <string name="profile_delete_title">Warning: Delete Account</string>
     <string name="profile_delete_message">This action is irreversible. All your data, expenses, and AI chat history will be permanently deleted.\n\nType \"delete\" below and check the box to confirm.</string>
@@ -125,8 +133,155 @@
     <string name="profile_delete_keyword">delete</string>
     <string name="profile_delete_confirm">I understand that my data will be lost</string>
     <string name="profile_delete_invalid">You must type \"delete\" and check the box.</string>
+    <string name="profile_processing">Processing…</string>
+    <string name="profile_name_required">Name cannot be empty</string>
+    <string name="profile_save_success">Profile saved successfully!</string>
+    <string name="profile_save_error_db">Failed to update database</string>
+    <string name="profile_save_error_auth">Failed to update profile</string>
+    <string name="profile_delete_success">Account marked for deletion. Signed out.</string>
+    <string name="profile_delete_error">Failed to process account deletion</string>
+    <string name="cd_avatar">Avatar</string>
 
+    <!-- Auth -->
+    <string name="auth_create_account">Create Account</string>
+    <string name="auth_welcome_back">Welcome back! Sign in to continue.</string>
+    <string name="auth_register_subtitle">Create your account in a few steps.</string>
+    <string name="auth_no_account">Don\'t have an account? Register</string>
+    <string name="auth_have_account">Already have an account? Sign in</string>
+    <string name="auth_or_continue_with">or continue with</string>
+    <string name="cd_show_password">Show password</string>
+    <string name="cd_hide_password">Hide password</string>
+    <string name="exit_press_back_again">Press back again to exit</string>
+    <string name="auth_login_success">Login successful!</string>
+    <string name="auth_login_failed">Login failed: %1$s</string>
+    <string name="auth_google_login_success">Google login successful!</string>
+    <string name="auth_google_login_failed">Google login failed.</string>
+    <string name="auth_google_login_cancelled">Google login cancelled.</string>
+    <string name="auth_register_success">Registration successful!</string>
+    <string name="auth_register_failed">Registration failed: %1$s</string>
+    <string name="auth_err_empty_fields">Please fill in all fields.</string>
+    <string name="auth_err_password_mismatch">Passwords do not match.</string>
+    <string name="auth_err_password_length">Password must be at least 6 characters.</string>
+    <string name="action_logging_in">Logging in…</string>
+    <string name="action_registering">Creating account…</string>
+    <string name="auth_err_init_failed">Data initialization failed: %1$s</string>
+    <string name="auth_default_user_name">User</string>
 
-    <string name="get_started">Get started</string>
+    <!-- Home -->
+    <string name="home_total_expenses">Total Expenses</string>
+    <string name="home_this_month">This Month</string>
+    <string name="home_expenses_chart_center">Expenses\nThis Month</string>
+    <string name="home_comparison_mock">+5% from last month</string>
+    <string name="home_recent_transactions">Recent Transactions</string>
+    <string name="home_no_transactions">No transactions yet.</string>
+    <string name="section_monthly_overview">Monthly Overview</string>
+    <string name="section_spending_by_category">Spending by Category</string>
+    <string name="section_summary">Summary</string>
+    <string name="section_charts">Charts</string>
+    <string name="section_manual_entry">Manual Entry</string>
+    <string name="section_account_actions">Account</string>
+
+    <!-- Report -->
+    <string name="report_income">Income</string>
+    <string name="report_expense">Expense</string>
+    <string name="report_top_category">Top Category: %1$s ($%2$.2f)</string>
+    <string name="report_no_expenses">No expenses in this period</string>
+    <string name="report_chart_bar">Bar</string>
+    <string name="report_chart_pie">Pie</string>
+    <string name="report_expenses_center">Expenses</string>
+    <string name="report_loading_suffix"> (Loading…)</string>
+    <string name="report_select_date_range">Select Date Range</string>
+
+    <!-- Chat / Add -->
+    <string name="chat_mode_manual">Manual</string>
+    <string name="chat_mode_ai">AI Chat</string>
+    <string name="chat_type_expense">Expense</string>
+    <string name="chat_type_income">Income</string>
+    <string name="chat_input_placeholder">Type a message…</string>
+    <string name="chat_uploading">Uploading image…</string>
+    <string name="chat_cleared">Chat history cleared from cloud.</string>
+    <string name="chat_send_failed">Failed to send message: %1$s</string>
+    <string name="chat_upload_failed">Upload failed: %1$s</string>
+    <string name="chat_ai_response">I will categorize your last transaction automatically.</string>
+    <string name="add_voice_recording">Recording AI Voice…</string>
+    <string name="error_mic_permission">Microphone permission required.</string>
+    <string name="error_camera_permission">Camera permission required.</string>
+    <string name="error_storage_disabled">Storage access is disabled in App Settings</string>
+    <string name="error_mic_disabled">Microphone is disabled in App Settings</string>
+    <string name="add_saving_manual">Saving manual transaction…</string>
+    <string name="cd_clear_chat">Clear chat</string>
+    <string name="cd_upload_image">Upload image</string>
+    <string name="cd_voice_input">Voice input</string>
+    <string name="cd_send_message">Send message</string>
+    <string name="cd_chat_image">Chat image</string>
+
+    <!-- Charts -->
+    <string name="chart_no_data">No data</string>
+
+    <!-- Currency -->
     <string name="currency">Currency</string>
+    <string name="price_per_month_usd">$%1$s / Month</string>
+    <string name="price_per_month_aud">$%1$s AUD / Month</string>
+    <string name="price_per_month_jpy">¥%1$s / Month</string>
+    <string name="price_per_month_vnd">%1$s đ / Tháng</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_page1_title">Track expenses easily</string>
+    <string name="onboarding_page1_desc">Log spending manually or let AI categorize transactions for you.</string>
+    <string name="onboarding_page2_title">Smart reports</string>
+    <string name="onboarding_page2_desc">View charts, filter transactions, and export CSV anytime.</string>
+    <string name="onboarding_page3_title">Secure &amp; synced</string>
+    <string name="onboarding_page3_desc">Sign in with Google or email. Your data stays in Firebase.</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_get_started">Get started</string>
+
+    <!-- Budget -->
+    <string name="budget_label">Monthly budget: %1$s</string>
+    <string name="budget_warning">You have used 80% of your monthly budget.</string>
+    <string name="budget_exceeded">Monthly budget exceeded!</string>
+    <string name="settings_monthly_budget">Monthly budget</string>
+    <string name="settings_budget_amount">Budget amount (0 = disabled)</string>
+    <string name="settings_budget_saved">Budget saved</string>
+
+    <!-- Search / filter / export -->
+    <string name="search_transactions">Search transactions</string>
+    <string name="filter_category">Category</string>
+    <string name="filter_all_categories">All categories</string>
+    <string name="export_csv">Export CSV</string>
+    <string name="export_share_title">Share report</string>
+    <string name="export_no_data">No data to export</string>
+    <string name="report_transaction_list">Transactions</string>
+
+    <!-- Auth extras -->
+    <string name="auth_forgot_password">Forgot password?</string>
+    <string name="auth_forgot_password_desc">Enter your email and we will send a reset link.</string>
+    <string name="auth_send_reset_link">Send reset link</string>
+    <string name="auth_sending_reset">Sending…</string>
+    <string name="auth_reset_email_sent">Password reset email sent.</string>
+    <string name="auth_reset_failed">Reset failed: %1$s</string>
+    <string name="auth_err_invalid_email">Please enter a valid email address.</string>
+
+    <!-- Settings extras -->
+    <string name="settings_security">Security &amp; personalization</string>
+    <string name="settings_biometric">Unlock with biometrics</string>
+    <string name="settings_dynamic_color">Dynamic color (Material You)</string>
+    <string name="settings_haptic">Haptic feedback</string>
+    <string name="settings_permissions">App permissions</string>
+    <string name="biometric_title">Unlock PocketMind</string>
+    <string name="biometric_subtitle">Confirm your identity to continue</string>
+    <string name="biometric_unlock_prompt">Waiting for biometric unlock…</string>
+
+    <!-- Chat extras -->
+    <string name="chat_ai_thinking">AI is thinking…</string>
+    <string name="chat_ai_saved">Transaction saved from AI response.</string>
+    <string name="chat_ai_error">AI service unavailable. Try again later.</string>
+    <string name="chat_transaction_saved">Expense saved from chat.</string>
+    <string name="add_saved_success">Transaction saved!</string>
+    <string name="add_save_failed">Save failed: %1$s</string>
+    <string name="err_invalid_amount">Please enter a valid amount.</string>
+    <string name="err_category_required">Category is required.</string>
+
+    <!-- Payment -->
+    <string name="payment_sepay_qr_hint">Sepay QR URL (open in browser to pay):</string>
 </resources>

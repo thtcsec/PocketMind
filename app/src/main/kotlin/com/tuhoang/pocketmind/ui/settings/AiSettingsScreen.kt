@@ -45,6 +45,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tuhoang.pocketmind.R
 import com.tuhoang.pocketmind.utils.CurrencyUtils
 import com.tuhoang.pocketmind.utils.PaymentUtils
+import com.tuhoang.pocketmind.utils.SepayUtils
 import com.tuhoang.pocketmind.utils.PrefsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,13 +79,14 @@ fun AiSettingsScreen(onBack: () -> Unit) {
                                 else -> 0.0
                             }
                             val features = (doc.get("features") as? List<Map<String, Any>>)?.let { list ->
-                                buildFeatureDescription(list)
+                                buildFeatureDescription(context, list)
                             } ?: ""
                             PlanUiModel(
                                 id = id,
                                 name = name,
                                 priceLabel = if (amount == 0.0) context.getString(R.string.ai_status_active)
-                                else CurrencyUtils.formatPrice(amount, rate, currency),
+                                else CurrencyUtils.formatPrice(context, amount, rate, currency),
+                                amountVnd = CurrencyUtils.toVndAmount(amount, rate, currency),
                                 description = features,
                                 isPaid = amount > 0.0,
                                 accentColor = when (id) {
@@ -121,6 +123,23 @@ fun AiSettingsScreen(onBack: () -> Unit) {
                     Text(stringResource(R.string.payment_bank_owner))
                     Text(stringResource(R.string.payment_code_label), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
                     Text(state.code, style = MaterialTheme.typography.titleMedium)
+                    val qrUrl = SepayUtils.buildVietQrUrl(
+                        account = SepayUtils.BankAccount(),
+                        amount = state.amountVnd,
+                        content = SepayUtils.buildTransferContent(state.code)
+                    )
+                    if (qrUrl.isNotEmpty()) {
+                        Text(
+                            text = stringResource(R.string.payment_sepay_qr_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                        Text(
+                            text = qrUrl,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             },
             confirmButton = {
@@ -133,7 +152,7 @@ fun AiSettingsScreen(onBack: () -> Unit) {
                     val transaction = hashMapOf(
                         "userId" to user.uid,
                         "planId" to state.planId,
-                        "amount_vnd" to 0,
+                        "amount_vnd" to state.amountVnd,
                         "provider" to "manual",
                         "status" to "pending",
                         "timestamp" to FieldValue.serverTimestamp()
@@ -161,7 +180,7 @@ fun AiSettingsScreen(onBack: () -> Unit) {
                 title = { Text(stringResource(R.string.settings_ai_config)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )
@@ -196,7 +215,11 @@ fun AiSettingsScreen(onBack: () -> Unit) {
                             colors = CardDefaults.cardColors(),
                             onClick = {
                                 if (plan.isPaid) {
-                                    paymentDialog = PaymentDialogState(plan.id, PaymentUtils.generatePaymentCode())
+                                    paymentDialog = PaymentDialogState(
+                                        planId = plan.id,
+                                        code = PaymentUtils.generatePaymentCode(),
+                                        amountVnd = plan.amountVnd
+                                    )
                                 }
                             }
                         ) {
@@ -248,26 +271,29 @@ private data class PlanUiModel(
     val id: String,
     val name: String,
     val priceLabel: String,
+    val amountVnd: Long,
     val description: String,
     val isPaid: Boolean,
     val accentColor: Color
 )
 
-private data class PaymentDialogState(val planId: String, val code: String)
+private data class PaymentDialogState(val planId: String, val code: String, val amountVnd: Long)
 
-private fun buildFeatureDescription(features: List<Map<String, Any>>): String {
+private fun buildFeatureDescription(context: android.content.Context, features: List<Map<String, Any>>): String {
     val sb = StringBuilder()
     for (feature in features) {
         val key = feature["key"] as? String ?: continue
         val value = feature["value"]
         when (key) {
-            "TEXT_CHAT_LIMIT" -> sb.append("• $value Text Chats per cycle\n")
-            "UNLIM_TEXT" -> if (value == true) sb.append("• Unlimited Text Chats\n")
-            "PRIORITY_QUEUE" -> if (value == true) sb.append("• Priority Processing Queue\n")
-            "VOICE_ALLOWED" -> if (value == true) sb.append("• Voice Interaction Included\n")
-            "IMAGE_PARSING" -> if (value == true) sb.append("• Advanced Image & Receipt Parsing\n")
-            "PREMIUM_MODELS" -> if (value is List<*>) sb.append("• Premium Models: ${value.joinToString(", ")}\n")
-            else -> sb.append("• $key: $value\n")
+            "TEXT_CHAT_LIMIT" -> sb.append(context.getString(R.string.ai_feature_text_limit, value.toString())).append('\n')
+            "UNLIM_TEXT" -> if (value == true) sb.append(context.getString(R.string.ai_feature_unlim_text)).append('\n')
+            "PRIORITY_QUEUE" -> if (value == true) sb.append(context.getString(R.string.ai_feature_priority)).append('\n')
+            "VOICE_ALLOWED" -> if (value == true) sb.append(context.getString(R.string.ai_feature_voice)).append('\n')
+            "IMAGE_PARSING" -> if (value == true) sb.append(context.getString(R.string.ai_feature_image)).append('\n')
+            "PREMIUM_MODELS" -> if (value is List<*>) {
+                sb.append(context.getString(R.string.ai_feature_premium_models, value.joinToString(", "))).append('\n')
+            }
+            else -> sb.append(context.getString(R.string.ai_feature_generic, key, value.toString())).append('\n')
         }
     }
     return sb.toString().trim()

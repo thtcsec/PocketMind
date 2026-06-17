@@ -58,7 +58,13 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showCurrencyDialog by remember { mutableStateOf(false) }
+    var showBudgetDialog by remember { mutableStateOf(false) }
     var cacheSize by remember { mutableStateOf(formatSize(getDirSize(context.cacheDir))) }
+    var budgetInput by remember { mutableStateOf(prefs.getMonthlyBudget().toLong().toString()) }
+
+    var biometricEnabled by remember { mutableStateOf(prefs.isBiometricEnabled()) }
+    var dynamicColorEnabled by remember { mutableStateOf(prefs.isDynamicColorEnabled()) }
+    var hapticEnabled by remember { mutableStateOf(prefs.isHapticEnabled()) }
 
     var cameraEnabled by remember {
         mutableStateOf(prefs.isCameraEnabled(hasPermission(context, Manifest.permission.CAMERA)))
@@ -102,8 +108,9 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
     val versionName = remember {
         try {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                ?: context.getString(R.string.settings_unknown_version)
         } catch (_: PackageManager.NameNotFoundException) {
-            "Unknown"
+            context.getString(R.string.settings_unknown_version)
         }
     }
 
@@ -139,20 +146,48 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
     if (showLanguageDialog) {
         AlertDialog(
             onDismissRequest = { showLanguageDialog = false },
-            title = { Text("Select Language") },
+            title = { Text(stringResource(R.string.settings_select_language)) },
             text = {
                 Column {
                     TextButton(onClick = {
                         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
                         showLanguageDialog = false
-                    }) { Text("English") }
+                    }) { Text(stringResource(R.string.english)) }
                     TextButton(onClick = {
                         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("vi"))
                         showLanguageDialog = false
-                    }) { Text("Tiếng Việt") }
+                    }) { Text(stringResource(R.string.vietnamese)) }
                 }
             },
             confirmButton = { TextButton(onClick = { showLanguageDialog = false }) { Text(stringResource(R.string.action_cancel)) } }
+        )
+    }
+
+    if (showBudgetDialog) {
+        AlertDialog(
+            onDismissRequest = { showBudgetDialog = false },
+            title = { Text(stringResource(R.string.settings_monthly_budget)) },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = budgetInput,
+                    onValueChange = { budgetInput = it.filter { ch -> ch.isDigit() } },
+                    label = { Text(stringResource(R.string.settings_budget_amount)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val budget = budgetInput.toDoubleOrNull() ?: 0.0
+                    prefs.setMonthlyBudget(budget)
+                    showBudgetDialog = false
+                    Toast.makeText(context, R.string.settings_budget_saved, Toast.LENGTH_SHORT).show()
+                }) { Text(stringResource(R.string.action_save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBudgetDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
         )
     }
 
@@ -182,7 +217,7 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
                 title = { Text(stringResource(R.string.title_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )
@@ -198,10 +233,14 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
 
             SectionHeader(stringResource(R.string.settings_data_storage))
             SettingsRow(stringResource(R.string.settings_currency), currency) { showCurrencyDialog = true }
+            SettingsRow(stringResource(R.string.settings_monthly_budget), budgetInput.ifBlank { "0" }) {
+                budgetInput = prefs.getMonthlyBudget().toLong().toString()
+                showBudgetDialog = true
+            }
             SettingsRow(stringResource(R.string.settings_clear_cache), cacheSize) {
                 if (deleteDir(context.cacheDir)) {
                     cacheSize = formatSize(getDirSize(context.cacheDir))
-                    Toast.makeText(context, "Cache cleared.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.settings_cache_cleared, Toast.LENGTH_SHORT).show()
                 }
             }
             HorizontalDivider()
@@ -213,6 +252,22 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
             }
             HorizontalDivider()
 
+            SectionHeader(stringResource(R.string.settings_security))
+            PermissionSwitch(stringResource(R.string.settings_biometric), biometricEnabled) { checked ->
+                biometricEnabled = checked
+                prefs.setBiometricEnabled(checked)
+            }
+            PermissionSwitch(stringResource(R.string.settings_dynamic_color), dynamicColorEnabled) { checked ->
+                dynamicColorEnabled = checked
+                prefs.setDynamicColorEnabled(checked)
+            }
+            PermissionSwitch(stringResource(R.string.settings_haptic), hapticEnabled) { checked ->
+                hapticEnabled = checked
+                prefs.setHapticEnabled(checked)
+            }
+            HorizontalDivider()
+
+            SectionHeader(stringResource(R.string.settings_permissions))
             PermissionSwitch(stringResource(R.string.settings_permissions_camera), cameraEnabled) { checked ->
                 if (checked) {
                     if (hasPermission(context, Manifest.permission.CAMERA)) {
@@ -249,7 +304,7 @@ fun SettingsScreen(onBack: () -> Unit, onNavigateAiSettings: () -> Unit) {
             HorizontalDivider()
 
             ListItem(
-                headlineContent = { Text("Version: $versionName") },
+                headlineContent = { Text(stringResource(R.string.settings_version, versionName)) },
                 supportingContent = { Text(stringResource(R.string.settings_developer)) }
             )
         }

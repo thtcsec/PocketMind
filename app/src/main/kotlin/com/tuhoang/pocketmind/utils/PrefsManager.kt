@@ -19,6 +19,11 @@ class PrefsManager private constructor(context: Context) {
         const val PREF_CAMERA_ENABLED = "PREF_CAMERA_ENABLED"
         const val PREF_STORAGE_ENABLED = "PREF_STORAGE_ENABLED"
         const val PREF_MIC_ENABLED = "PREF_MIC_ENABLED"
+        const val PREF_ONBOARDING_COMPLETE = "PREF_ONBOARDING_COMPLETE"
+        const val PREF_BIOMETRIC_ENABLED = "PREF_BIOMETRIC_ENABLED"
+        const val PREF_MONTHLY_BUDGET = "PREF_MONTHLY_BUDGET"
+        const val PREF_DYNAMIC_COLOR = "PREF_DYNAMIC_COLOR"
+        const val PREF_HAPTIC_ENABLED = "PREF_HAPTIC_ENABLED"
 
         @Volatile
         private var instance: PrefsManager? = null
@@ -77,4 +82,26 @@ class PrefsManager private constructor(context: Context) {
     fun isAiTranslationEnabled(): Boolean = prefs.getBoolean(PREF_AI_TRANSLATION_ENABLED, false)
     fun setAiTranslationEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(PREF_AI_TRANSLATION_ENABLED, enabled).apply()
+
+    fun isOnboardingComplete(): Boolean = prefs.getBoolean(PREF_ONBOARDING_COMPLETE, false)
+    fun setOnboardingComplete(complete: Boolean) =
+        prefs.edit().putBoolean(PREF_ONBOARDING_COMPLETE, complete).apply()
+
+    fun isBiometricEnabled(): Boolean = prefs.getBoolean(PREF_BIOMETRIC_ENABLED, false)
+    fun setBiometricEnabled(enabled: Boolean) =
+        prefs.edit().putBoolean(PREF_BIOMETRIC_ENABLED, enabled).apply()
+
+    fun getMonthlyBudget(defaultBudget: Double = 0.0): Double =
+        prefs.getFloat(PREF_MONTHLY_BUDGET, defaultBudget.toFloat()).toDouble()
+
+    fun setMonthlyBudget(budget: Double) =
+        prefs.edit().putFloat(PREF_MONTHLY_BUDGET, budget.toFloat()).apply()
+
+    fun isDynamicColorEnabled(): Boolean = prefs.getBoolean(PREF_DYNAMIC_COLOR, true)
+    fun setDynamicColorEnabled(enabled: Boolean) =
+        prefs.edit().putBoolean(PREF_DYNAMIC_COLOR, enabled).apply()
+
+    fun isHapticEnabled(): Boolean = prefs.getBoolean(PREF_HAPTIC_ENABLED, true)
+    fun setHapticEnabled(enabled: Boolean) =
+        prefs.edit().putBoolean(PREF_HAPTIC_ENABLED, enabled).apply()
 }

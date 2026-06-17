@@ -3,7 +3,6 @@ package com.tuhoang.pocketmind.ui.chat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +26,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,14 +54,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.tuhoang.pocketmind.R
 import com.tuhoang.pocketmind.data.models.ChatMessage
+import com.tuhoang.pocketmind.ui.components.SectionCard
+import com.tuhoang.pocketmind.ui.components.rememberShowSnackbar
+import com.tuhoang.pocketmind.utils.HapticUtils
 import com.tuhoang.pocketmind.utils.PrefsManager
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
     val context = LocalContext.current
+    val showSnackbar = rememberShowSnackbar()
     val messages by viewModel.messages.collectAsState()
     val errorEvents by viewModel.errorEvents.collectAsState()
     val infoEvents by viewModel.infoEvents.collectAsState()
+    val isSavingManual by viewModel.isSavingManual.collectAsState()
+    val isAiThinking by viewModel.isAiThinking.collectAsState()
 
     var modeIndex by remember { mutableIntStateOf(0) }
     var inputText by remember { mutableStateOf("") }
@@ -71,14 +77,14 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
 
     LaunchedEffect(errorEvents) {
         errorEvents?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            showSnackbar(it)
             viewModel.consumeError()
         }
     }
 
     LaunchedEffect(infoEvents) {
         infoEvents?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            showSnackbar(it)
             viewModel.consumeInfo()
         }
     }
@@ -97,9 +103,9 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            Toast.makeText(context, context.getString(R.string.add_voice_recording), Toast.LENGTH_SHORT).show()
+            showSnackbar(context.getString(R.string.add_voice_recording))
         } else {
-            Toast.makeText(context, context.getString(R.string.error_mic_permission), Toast.LENGTH_LONG).show()
+            showSnackbar(context.getString(R.string.error_mic_permission))
         }
     }
 
@@ -107,7 +113,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) pickImageLauncher.launch("image/*")
-        else Toast.makeText(context, context.getString(R.string.error_camera_permission), Toast.LENGTH_LONG).show()
+        else showSnackbar(context.getString(R.string.error_camera_permission))
     }
 
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
@@ -116,20 +122,27 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
                 selected = modeIndex == 0,
                 onClick = { modeIndex = 0 },
                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
-            ) { Text("Manual") }
+            ) { Text(stringResource(R.string.chat_mode_manual)) }
             SegmentedButton(
                 selected = modeIndex == 1,
                 onClick = { modeIndex = 1 },
                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
-            ) { Text("AI Chat") }
+            ) { Text(stringResource(R.string.chat_mode_ai)) }
         }
 
         if (modeIndex == 0) {
-            ManualEntrySection(
-                onSave = {
-                    Toast.makeText(context, context.getString(R.string.add_saving_manual), Toast.LENGTH_SHORT).show()
-                }
-            )
+            SectionCard(
+                title = stringResource(R.string.section_manual_entry),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                ManualEntryFields(
+                    isSaving = isSavingManual,
+                    onSave = { amount, type, category, note ->
+                        HapticUtils.performClick(context)
+                        viewModel.saveManualTransaction(amount, type, category, note)
+                    }
+                )
+            }
         } else {
             LazyColumn(
                 state = listState,
@@ -137,14 +150,29 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(messages) { msg -> ChatBubble(msg) }
+                if (isAiThinking) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                            Text(stringResource(R.string.chat_ai_thinking))
+                        }
+                    }
+                }
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { viewModel.clearChatHistory() }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Clear")
+                IconButton(onClick = {
+                    HapticUtils.performClick(context)
+                    viewModel.clearChatHistory()
+                }) {
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cd_clear_chat))
                 }
                 IconButton(onClick = {
                     val storageEnabled = PrefsManager.getInstance().isStorageEnabled(
@@ -152,7 +180,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
                             ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                     )
                     if (!storageEnabled) {
-                        Toast.makeText(context, "Storage access is disabled in App Settings", Toast.LENGTH_SHORT).show()
+                        showSnackbar(context.getString(R.string.error_storage_disabled))
                         return@IconButton
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ||
@@ -163,14 +191,15 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
                         requestStorageLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 }) {
-                    Icon(Icons.Default.AttachFile, contentDescription = "Upload")
+                    Icon(Icons.Default.AttachFile, contentDescription = stringResource(R.string.cd_upload_image))
                 }
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Type a message...") },
-                    maxLines = 3
+                    placeholder = { Text(stringResource(R.string.chat_input_placeholder)) },
+                    maxLines = 3,
+                    enabled = !isAiThinking
                 )
                 if (inputText.isBlank()) {
                     IconButton(onClick = {
@@ -178,23 +207,27 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
                             ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                         )
                         if (!micEnabled) {
-                            Toast.makeText(context, "Microphone is disabled in App Settings", Toast.LENGTH_SHORT).show()
+                            showSnackbar(context.getString(R.string.error_mic_disabled))
                             return@IconButton
                         }
                         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(context, context.getString(R.string.add_voice_recording), Toast.LENGTH_SHORT).show()
+                            showSnackbar(context.getString(R.string.add_voice_recording))
                         } else {
                             requestMicLauncher.launch(Manifest.permission.RECORD_AUDIO)
                         }
                     }) {
-                        Icon(Icons.Default.Mic, contentDescription = "Voice")
+                        Icon(Icons.Default.Mic, contentDescription = stringResource(R.string.cd_voice_input))
                     }
                 } else {
-                    IconButton(onClick = {
-                        viewModel.sendMessage(inputText.trim())
-                        inputText = ""
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                    IconButton(
+                        onClick = {
+                            HapticUtils.performClick(context)
+                            viewModel.sendMessage(inputText.trim())
+                            inputText = ""
+                        },
+                        enabled = !isAiThinking
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.cd_send_message))
                     }
                 }
             }
@@ -203,14 +236,17 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
 }
 
 @Composable
-private fun ManualEntrySection(onSave: () -> Unit) {
+private fun ManualEntryFields(
+    isSaving: Boolean,
+    onSave: (amount: String, type: String, category: String, note: String) -> Unit
+) {
     var amount by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     var typeIndex by remember { mutableIntStateOf(0) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -218,17 +254,33 @@ private fun ManualEntrySection(onSave: () -> Unit) {
                 selected = typeIndex == 0,
                 onClick = { typeIndex = 0 },
                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
-            ) { Text("Expense") }
+            ) { Text(stringResource(R.string.chat_type_expense)) }
             SegmentedButton(
                 selected = typeIndex == 1,
                 onClick = { typeIndex = 1 },
                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
-            ) { Text("Income") }
+            ) { Text(stringResource(R.string.chat_type_income)) }
         }
-        OutlinedTextField(value = amount, onValueChange = { amount = it }, label = { Text("Amount") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = category, onValueChange = { category = it }, label = { Text("Category") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = note, onValueChange = { note = it }, label = { Text("Note") }, modifier = Modifier.fillMaxWidth())
-        Button(onClick = onSave, modifier = Modifier.fillMaxWidth()) { Text("Save") }
+        OutlinedTextField(value = amount, onValueChange = { amount = it }, label = { Text(stringResource(R.string.label_amount)) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = category, onValueChange = { category = it }, label = { Text(stringResource(R.string.label_category)) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = note, onValueChange = { note = it }, label = { Text(stringResource(R.string.label_note)) }, modifier = Modifier.fillMaxWidth())
+        Button(
+            onClick = {
+                val type = if (typeIndex == 0) "expense" else "income"
+                onSave(amount, type, category, note)
+                amount = ""
+                category = ""
+                note = ""
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isSaving
+        ) {
+            if (isSaving) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+            } else {
+                Text(stringResource(R.string.action_save))
+            }
+        }
     }
 }
 
@@ -251,7 +303,7 @@ private fun ChatBubble(message: ChatMessage) {
                 if (message.imageUrl != null) {
                     AsyncImage(
                         model = message.imageUrl,
-                        contentDescription = "Chat image",
+                        contentDescription = stringResource(R.string.cd_chat_image),
                         modifier = Modifier.fillMaxWidth().size(180.dp),
                         contentScale = ContentScale.Crop
                     )

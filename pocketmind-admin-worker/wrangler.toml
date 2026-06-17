@@ -2,6 +2,9 @@ name = "pocketmind"
 main = "src/index.js"
 compatibility_date = "2026-03-01"
 
+# Set secrets via: wrangler secret put FIREBASE_API_KEY
+# See README.md for full list.
+
 [observability]
 enabled = true
 [build]

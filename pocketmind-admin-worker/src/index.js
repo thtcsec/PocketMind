@@ -1,38 +1,39 @@
+import {
+  badRequest,
+  callOpenAi,
+  decrementUserChatLimit,
+  getUserChatLimit,
+  jsonResponse,
+  requireAuth,
+  tryParseExpenseJson,
+} from "./firebase.js";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const route = url.pathname;
 
-    // Simple router
-    if (route === "/api/models") {
+    if (route === "/api/models" && request.method === "GET") {
+      const auth = await requireAuth(request, env);
+      if (auth.error) return auth.error;
       return fetchAllModels(env);
     }
-    
+
     if (route === "/api/chat" && request.method === "POST") {
       return processAiChat(request, env);
     }
 
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: "Route not found"
-      }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: false, error: "Route not found" }, 404);
   },
 };
 
 async function fetchAllModels(env) {
   try {
-    // OpenAI models
     const openaiResp = await fetch("https://api.openai.com/v1/models", {
-      headers: {
-        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-      },
+      headers: { Authorization: `Bearer ${env.OPENAI_API_KEY}` },
     });
     const openaiJson = await openaiResp.json();
 
-    // Anthropic models
     const anthropicResp = await fetch("https://api.anthropic.com/v1/models", {
       headers: {
         "x-api-key": env.ANTHROPIC_API_KEY,
@@ -41,50 +42,32 @@ async function fetchAllModels(env) {
     });
     const anthropicJson = await anthropicResp.json();
 
-    // Google Gemini models
     const geminiResp = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models",
-      {
-        headers: {
-          Authorization: `Bearer ${env.GEMINI_API_KEY}`,
-        },
-      }
+      { headers: { Authorization: `Bearer ${env.GEMINI_API_KEY}` } }
     );
     const geminiJson = await geminiResp.json();
 
-    // Combine and standardize
-    const combined = {
-      openai: openaiJson.data || [],
-      anthropic: anthropicJson.data || [],
-      gemini: geminiJson.models || [],
-    };
-
-    // Example price conversion:
     const usdToVnd = (usd) => Math.round(usd * 24000);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        models: combined,
-        pricing: {
-          openai_usd: 0, // no pricing returned from model listing
-          openai_vnd: usdToVnd(0),
-          anthropic_usd: 0,
-          anthropic_vnd: usdToVnd(0),
-          gemini_usd: 0,
-          gemini_vnd: usdToVnd(0),
-        },
-      }),
-      { headers: { "Content-Type": "application/json" } }
-    );
+    return jsonResponse({
+      success: true,
+      models: {
+        openai: openaiJson.data || [],
+        anthropic: anthropicJson.data || [],
+        gemini: geminiJson.models || [],
+      },
+      pricing: {
+        openai_usd: 0,
+        openai_vnd: usdToVnd(0),
+        anthropic_usd: 0,
+        anthropic_vnd: usdToVnd(0),
+        gemini_usd: 0,
+        gemini_vnd: usdToVnd(0),
+      },
+    });
   } catch (err) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: err.message,
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: false, error: err.message }, 500);
   }
 }
 
@@ -94,32 +77,70 @@ async function processAiChat(request, env) {
     const { userId, messages, provider } = body;
 
     if (!userId || !messages) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
+      return badRequest("Missing required fields: userId, messages");
     }
 
-    // TODO: In a real Cloudflare Worker with REST Firebase integration:
-    // 1. Fetch /users/{userId} to check ai_chat_limit.
-    // 2. If ai_chat_limit <= 0, return { error: "Chat limit reached" }.
-    // 3. Make LLM API call to provider (OpenAI/Anthropic/Gemini).
-    // 4. Decrement ai_chat_limit by 1 via Firestore REST API.
-    // 5. Return LLM response.
-    
-    // For now, we mock a safe extraction response that respects the architecture.
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
+    const auth = await requireAuth(request, env, userId);
+    if (auth.error) return auth.error;
+
+    const limit = await getUserChatLimit(env, userId);
+    if (limit === null) {
+      return jsonResponse(
+        { success: false, error: "Server Firestore credentials not configured" },
+        503
+      );
+    }
+    if (limit <= 0) {
+      return jsonResponse({ success: false, error: "Chat limit reached" }, 403);
+    }
+
+    const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+    const userText = lastUserMessage?.content || "";
+
+    let replyMessage;
+    let extractedData = null;
+
+    if (env.OPENAI_API_KEY) {
+      const systemPrompt =
+        "You are PocketMind finance assistant. Extract expense/income from user text. " +
+        "Reply with a short friendly sentence, then on a new line output ONLY JSON: " +
+        '{"category":"...","amount":123,"note":"...","type":"expense|income"}';
+
+      const llmText = await callOpenAi(env, [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userText },
+      ]);
+
+      if (llmText) {
+        extractedData = tryParseExpenseJson(llmText);
+        replyMessage = llmText.split("\n")[0].trim();
+      }
+    }
+
+    if (!replyMessage) {
+      extractedData = {
         category: "Food",
         amount: 50000,
-        note: "Extracted from chat mock",
-        type: "expense"
-      },
-      message: "This is a mock response from the secure AI middle-tier. Limits should be deducted here."
-    }), { headers: { "Content-Type": "application/json" } });
+        note: userText.slice(0, 120),
+        type: "expense",
+      };
+      replyMessage =
+        "Mock AI response (configure OPENAI_API_KEY on Worker for real extraction).";
+    }
 
+    const decremented = await decrementUserChatLimit(env, userId, limit);
+    if (!decremented) {
+      return jsonResponse({ success: false, error: "Failed to update chat limit" }, 500);
+    }
+
+    return jsonResponse({
+      success: true,
+      data: extractedData,
+      message: replyMessage,
+      provider: provider || "openai",
+      remaining_chats: Math.max(0, limit - 1),
+    });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ success: false, error: err.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: false, error: err.message }, 500);
   }
 }
